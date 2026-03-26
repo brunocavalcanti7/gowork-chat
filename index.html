@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GOWORK CHAT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #0a2b3e 0%, #1a4a6f 100%); font-family: 'Inter', sans-serif; }
+        .app { max-width: 600px; margin: 0 auto; background: #ffffff; height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { font-size: 24px; }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .header span { color: #60a5fa; }
+        .btn-sair { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .btn-voltar { background: none; border: none; color: white; font-size: 24px; cursor: pointer; margin-right: 12px; }
+        .lista-usuarios { flex: 1; overflow-y: auto; padding: 8px; background: #f8fafc; }
+        .secao { margin-bottom: 20px; }
+        .secao-titulo { font-weight: 600; color: #1e293b; margin: 12px 12px 8px 12px; padding-bottom: 5px; border-bottom: 2px solid #3b82f6; display: inline-block; font-size: 13px; }
+        .usuario-item { display: flex; align-items: center; padding: 12px 14px; margin: 3px 8px; background: white; border-radius: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .usuario-item:active { background: #f1f5f9; transform: scale(0.98); }
+        .usuario-avatar { position: relative; width: 48px; height: 48px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px; margin-right: 12px; }
+        .status-online { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #22c55e; border-radius: 50%; border: 2px solid white; }
+        .status-offline { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #94a3b8; border-radius: 50%; border: 2px solid white; }
+        .usuario-info { flex: 1; }
+        .usuario-nome { font-weight: 600; color: #0f172a; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+        .usuario-profissao { font-size: 11px; color: #3b82f6; margin-top: 2px; }
+        .ultima-msg { font-size: 11px; color: #64748b; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .chat-header { background: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%); color: white; padding: 15px 20px; display: flex; align-items: center; }
+        .chat-header-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .chat-avatar { width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; position: relative; }
+        .chat-nome { font-weight: 600; font-size: 16px; }
+        .chat-status { font-size: 11px; opacity: 0.8; }
+        .mensagens-area { flex: 1; overflow-y: auto; padding: 15px; background: #f1f5f9; display: flex; flex-direction: column; }
+        .mensagem { margin-bottom: 10px; display: flex; width: 100%; }
+        .mensagem.enviada { justify-content: flex-end; }
+        .mensagem.recebida { justify-content: flex-start; }
+        .mensagem-bolha { max-width: 75%; padding: 8px 14px; border-radius: 18px; word-wrap: break-word; cursor: pointer; }
+        .mensagem.enviada .mensagem-bolha { background: #3b82f6; color: white; border-bottom-right-radius: 4px; }
+        .mensagem.recebida .mensagem-bolha { background: white; color: #1e293b; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .mensagem-texto { font-size: 14px; }
+        .mensagem-hora { font-size: 9px; margin-top: 3px; opacity: 0.7; text-align: right; }
+        .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
+        .input-area { padding: 12px 15px; background: white; border-top: 1px solid #e2e8f0; display: flex; gap: 10px; align-items: flex-end; }
+        .input-mensagem { flex: 1; padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 24px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; background: #f8fafc; }
+        .input-mensagem:focus { outline: none; border-color: #3b82f6; background: white; }
+        .btn-enviar { background: #3b82f6; border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .loading { text-align: center; padding: 30px; color: #64748b; font-size: 13px; }
+        .form-card { background: white; border-radius: 20px; padding: 25px 20px; margin: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .form-card input, .form-card textarea { width: 100%; padding: 12px 14px; margin: 8px 0; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 14px; font-family: 'Inter', sans-serif; }
+        .form-card input:focus, .form-card textarea:focus { outline: none; border-color: #3b82f6; }
+        .form-card button { width: 100%; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+        .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; background: #f1f5f9; border: none; border-radius: 14px; font-size: 14px; font-weight: 600; cursor: pointer; color: #64748b; }
+        .tab-btn.active { background: #3b82f6; color: white; }
+        .error { color: #ef4444; font-size: 11px; margin-top: 5px; display: none; }
+        .success { color: #10b981; font-size: 11px; margin-top: 5px; display: none; }
+        .menu-contexto { position: fixed; background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); z-index: 1000; display: none; overflow: hidden; }
+        .menu-contexto button { display: block; width: 100%; padding: 12px 20px; background: white; border: none; text-align: left; cursor: pointer; font-size: 14px; }
+        .modal-editar { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1001; display: none; }
+        .modal-conteudo { background: white; border-radius: 20px; padding: 20px; width: 90%; max-width: 300px; }
+        .modal-conteudo input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; }
+        .modal-conteudo button { padding: 8px 16px; margin: 5px; border: none; border-radius: 10px; cursor: pointer; }
+        .btn-salvar { background: #3b82f6; color: white; }
+        .btn-cancelar { background: #f1f5f9; color: #64748b; }
+        .som-btn { background: #64748b; border: none; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; margin-left: 10px; }
+        .profile-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1002; display: none; }
+        .profile-card { background: white; border-radius: 24px; padding: 24px; width: 85%; max-width: 320px; text-align: center; }
+        .profile-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 32px; margin: 0 auto 15px; }
+        .profile-name { font-size: 20px; font-weight: 700; color: #1e293b; }
+        .profile-profession { font-size: 14px; color: #3b82f6; margin: 5px 0; }
+        .profile-bio { font-size: 14px; color: #475569; margin: 15px 0; padding: 10px; background: #f8fafc; border-radius: 12px; }
+        .profile-close { background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 10px; }
+        @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <div id="menuContexto" class="menu-contexto"></div>
+    <div id="modalEditar" class="modal-editar">
+        <div class="modal-conteudo">
+            <h3>✏️ Editar</h3>
+            <input type="text" id="editarTexto">
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-salvar" onclick="salvarEdicao()">Salvar</button>
+                <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-card" id="profileCard"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBFhZ99vDcG7lRRofsXW9Zn2xQu2ls8FZw",
+            authDomain: "gowork-chat.firebaseapp.com",
+            projectId: "gowork-chat",
+            storageBucket: "gowork-chat.firebasestorage.app",
+            messagingSenderId: "540873412810",
+            appId: "1:540873412810:web:e550434e8144194bc2a433"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        let usuarioAtual = null;
+        let chatCom = null;
+        let unsubscribeMessages = null;
+        let prestadorIdUrl = new URLSearchParams(window.location.search).get('p');
+        let mensagemSelecionada = null;
+        let audioCtx = null;
+        let somAtivo = false;
+        let onlineListeners = [];
+        let menuAtivo = false;
+        
+        // ==================== STATUS ONLINE ====================
+        function atualizarStatusOnline(userId, status) {
+            db.collection('usuarios').doc(userId).update({ online: status, ultimoAcesso: new Date() }).catch(e => console.log);
+        }
+        
+        function iniciarStatusOnline() {
+            if (!usuarioAtual) return;
+            atualizarStatusOnline(usuarioAtual.id, true);
+            window.addEventListener('beforeunload', () => atualizarStatusOnline(usuarioAtual.id, false));
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) atualizarStatusOnline(usuarioAtual.id, false);
+                else atualizarStatusOnline(usuarioAtual.id, true);
+            });
+            setInterval(() => atualizarStatusOnline(usuarioAtual.id, true), 30000);
+        }
+        
+        function escutarStatusOnline(userId, callback) {
+            const unsubscribe = db.collection('usuarios').doc(userId).onSnapshot(doc => {
+                if (doc.exists) callback(doc.data().online || false);
+            });
+            onlineListeners.push(unsubscribe);
+            return unsubscribe;
+        }
+        
+        // ==================== SOM ====================
+        function tocarSom() {
+            if (!somAtivo) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 880;
+                gain.gain.value = 0.2;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+                osc.stop(audioCtx.currentTime + 0.3);
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            } catch(e) { console.log('Som:', e); }
+        }
+        
+        function ativarSom() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx.resume();
+            somAtivo = true;
+            tocarSom();
+            alert('🔊 Som ativado!');
+        }
+        
+        // ==================== PERFIL ====================
+        function mostrarPerfil(usuario) {
+            const modal = document.getElementById('profileModal');
+            const card = document.getElementById('profileCard');
+            card.innerHTML = `
+                <div class="profile-avatar">${(usuario.nome || '?').charAt(0).toUpperCase()}</div>
+                <div class="profile-name">${escapeHtml(usuario.nome || '')}</div>
+                <div class="profile-profession">${escapeHtml(usuario.profissao || 'Profissão não informada')}</div>
+                <div class="profile-bio">📝 ${escapeHtml(usuario.bio || 'Nenhuma bio cadastrada')}</div>
+                <div style="font-size:12px; color:#64748b; margin:10px 0;">
+                    ${usuario.online ? '🟢 Online agora' : '⚫ Offline'}
+                </div>
+                <button class="profile-close" onclick="fecharPerfil()">Fechar</button>
+            `;
+            modal.style.display = 'flex';
+        }
+        
+        function fecharPerfil() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+        
+        // ==================== FUNÇÕES PRINCIPAIS ====================
+        function renderizar() {
+            const app = document.getElementById('app');
+            if (!usuarioAtual) {
+                app.innerHTML = `
+                    <div class="app">
+                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div></div>
+                        <div style="flex:1; display: flex; align-items: center; justify-content: center;">
+                            <div class="form-card">
+                                <div class="tab-buttons"><button id="btnEntrar" class="tab-btn active">Entrar</button><button id="btnCadastrar" class="tab-btn">Cadastrar</button></div>
+                                <div id="telaEntrar"><div id="erroLogin" class="error"></div><input type="email" id="emailLogin" placeholder="E-mail"><input type="password" id="senhaLogin" placeholder="Senha"><button onclick="fazerLogin()">Entrar</button></div>
+                                <div id="telaCadastrar" style="display:none"><div id="erroCadastro" class="error"></div><div id="sucessoCadastro" class="success"></div><input type="text" id="nome" placeholder="Nome completo"><input type="email" id="email" placeholder="E-mail"><input type="text" id="idUnico" placeholder="Seu ID único (ex: joao123)"><input type="text" id="profissao" placeholder="Profissão"><textarea id="bio" rows="3" placeholder="Bio"></textarea><input type="password" id="senha" placeholder="Senha (mínimo 6)"><button onclick="fazerCadastro()">Criar conta</button></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('btnEntrar').onclick = () => { document.getElementById('telaEntrar').style.display='block'; document.getElementById('telaCadastrar').style.display='none'; document.getElementById('btnEntrar').classList.add('active'); document.getElementById('btnCadastrar').classList.remove('active'); };
+                document.getElementById('btnCadastrar').onclick = () => { document.getElementById('telaEntrar').style.display='none'; document.getElementById('telaCadastrar').style.display='block'; document.getElementById('btnCadastrar').classList.add('active'); document.getElementById('btnEntrar').classList.remove('active'); };
+            } else {
+                app.innerHTML = `
+                    <div class="app">
+                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="som-btn" onclick="ativarSom()">🔊 Som</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div>
+                        <div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div>
+                    </div>
+                `;
+                carregarListas();
+                iniciarStatusOnline();
+            }
+        }
+        
+        async function carregarListas() {
+            const container = document.getElementById('listaUsuarios');
+            try {
+                const users = [];
+                (await db.collection('usuarios').get()).forEach(d => { if (d.id !== usuarioAtual.id) users.push({ id: d.id, ...d.data() }); });
+                const chats = await db.collection('chats').get();
+                const contatos = new Set();
+                chats.forEach(d => { const ids = d.id.split('_'); contatos.add(ids[0] === usuarioAtual.id ? ids[1] : ids[0]); });
+                const conversas = [], novos = [];
+                for (const u of users) {
+                    if (contatos.has(u.id)) {
+                        const msgs = await db.collection('chats').doc(obterChatId(usuarioAtual.id, u.id)).collection('mensagens').orderBy('timestamp', 'desc').limit(1).get();
+                        let ultima = '';
+                        if (!msgs.empty) { let t = msgs.docs[0].data().texto; ultima = t.substring(0, 40) + (t.length > 40 ? '...' : ''); }
+                        conversas.push({ ...u, ultima });
+                    } else { novos.push(u); }
+                }
+                let html = '';
+                if (conversas.length) html += `<div class="secao"><div class="secao-titulo">📌 CONVERSAS</div>${conversas.map(u => `<div class="usuario-item" onclick="abrirChat('${u.id}', '${u.nome}', '${u.profissao || ''}')"><div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}<div class="${u.online ? 'status-online' : 'status-offline'}"></div></div><div class="usuario-info"><div class="usuario-nome">${u.nome}</div><div class="usuario-profissao">${u.profissao || 'Profissional'}</div>${u.ultima ? `<div class="ultima-msg">${u.ultima}</div>` : ''}</div></div>`).join('')}</div>`;
+                if (novos.length) html += `<div class="secao"><div class="secao-titulo">👥 PRESTADORES</div>${novos.map(u => `<div class="usuario-item" onclick="abrirChat('${u.id}', '${u.nome}', '${u.profissao || ''}')"><div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}<div class="${u.online ? 'status-online' : 'status-offline'}"></div></div><div class="usuario-info"><div class="usuario-nome">${u.nome}</div><div class="usuario-profissao">${u.profissao || 'Profissional'}</div></div></div>`).join('')}</div>`;
+                if (!conversas.length && !novos.length) html = '<div class="loading">Nenhum prestador encontrado</div>';
+                container.innerHTML = html;
+                if (prestadorIdUrl) {
+                    const p = (await db.collection('usuarios').where('idUnico', '==', prestadorIdUrl).get()).docs[0];
+                    if (p) abrirChat(p.id, p.data().nome, p.data().profissao || '');
+                }
+            } catch(e) { container.innerHTML = '<div class="loading">Erro</div>'; }
+        }
+        
+        function abrirChat(id, nome, prof) {
+            chatCom = { id, nome, profissao: prof };
+            document.getElementById('app').innerHTML = `
+                <div class="app">
+                    <div class="chat-header">
+                        <button class="btn-voltar" onclick="voltar()">←</button>
+                        <div class="chat-header-info" onclick="carregarPerfilChat()">
+                            <div class="chat-avatar" id="chatAvatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div>
+                            <div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div>
+                        </div>
+                        <button class="som-btn" onclick="ativarSom()">🔊</button>
+                    </div>
+                    <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
+                    <div class="input-area"><textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea><button class="btn-enviar" onclick="enviarMsg()">➤</button></div>
+                </div>`;
+            document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
+            carregarMensagens();
+            
+            escutarStatusOnline(chatCom.id, (online) => {
+                const statusText = document.getElementById('chatStatus');
+                const statusDot = document.getElementById('chatStatusDot');
+                if (statusText) statusText.innerText = online ? '🟢 Online' : '⚫ Offline';
+                if (statusDot) statusDot.className = online ? 'status-online' : 'status-offline';
+            });
+        }
+        
+        async function carregarPerfilChat() {
+            const doc = await db.collection('usuarios').doc(chatCom.id).get();
+            if (doc.exists) {
+                mostrarPerfil({ id: doc.id, ...doc.data(), online: true });
+            }
+        }
+        
+        function voltar() { 
+            if (unsubscribeMessages) unsubscribeMessages();
+            onlineListeners.forEach(unsub => unsub());
+            onlineListeners = [];
+            chatCom = null; 
+            renderizar(); 
+        }
+        
+        let ultimaMsgId = null;
+        
+        function carregarMensagens() {
+            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+            if (unsubscribeMessages) unsubscribeMessages();
+            unsubscribeMessages = db.collection('chats').doc(chatId).collection('mensagens').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
+                const container = document.getElementById('mensagensArea');
+                if (!container) return;
+                const msgs = [];
+                snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+                if (msgs.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
+                msgs.sort((a,b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
+                const ultima = msgs[msgs.length - 1];
+                if (ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
+                    tocarSom();
+                    ultimaMsgId = ultima.id;
+                }
+                container.innerHTML = msgs.map(m => {
+                    const enviada = m.remetenteId === usuarioAtual.id;
+                    let hora = '';
+                    if (m.timestamp) hora = m.timestamp.toDate().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+                    const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
+                    return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'}"><div class="mensagem-bolha" onclick="abrirMenu(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"><div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
+                }).join('');
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+        
+        // ========== MENU CORRIGIDO ==========
+        function abrirMenu(event, id, texto, enviada) {
+            event.stopPropagation();
+            if (!enviada) return;
+            
+            mensagemSelecionada = { id, texto };
+            
+            if (menuAtivo) {
+                fecharMenu();
+            }
+            
+            const menu = document.getElementById('menuContexto');
+            menu.innerHTML = '';
+            
+            const btnEditar = document.createElement('button');
+            btnEditar.textContent = '✏️ Editar';
+            btnEditar.onclick = (e) => {
+                e.stopPropagation();
+                fecharMenu();
+                editarMsg();
+            };
+            
+            const btnApagar = document.createElement('button');
+            btnApagar.textContent = '🗑️ Apagar';
+            btnApagar.onclick = (e) => {
+                e.stopPropagation();
+                fecharMenu();
+                apagarMsg();
+            };
+            
+            menu.appendChild(btnEditar);
+            menu.appendChild(btnApagar);
+            
+            let x, y;
+            if (event.touches) {
+                x = event.touches[0].clientX;
+                y = event.touches[0].clientY;
+            } else {
+                x = event.clientX;
+                y = event.clientY;
+            }
+            
+            menu.style.display = 'block';
+            menu.style.left = (x - 80) + 'px';
+            menu.style.top = (y - 40) + 'px';
+            menuAtivo = true;
+            
+            const fecharFora = (e) => {
+                if (!menu.contains(e.target)) {
+                    fecharMenu();
+                    document.removeEventListener('click', fecharFora);
+                    document.removeEventListener('touchstart', fecharFora);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', fecharFora);
+                document.addEventListener('touchstart', fecharFora);
+            }, 100);
+        }
+        
+        function fecharMenu() {
+            const menu = document.getElementById('menuContexto');
+            menu.style.display = 'none';
+            menu.innerHTML = '';
+            menuAtivo = false;
+        }
+        
+        function editarMsg() {
+            document.getElementById('editarTexto').value = mensagemSelecionada.texto;
+            document.getElementById('modalEditar').style.display = 'flex';
+        }
+        
+        function apagarMsg() {
+            if (confirm('Apagar esta mensagem?')) {
+                const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+                db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).delete();
+            }
+        }
+        
+        function fecharModal() {
+            document.getElementById('modalEditar').style.display = 'none';
+        }
+        
+        async function salvarEdicao() {
+            const novo = document.getElementById('editarTexto').value.trim();
+            if (!novo) return;
+            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+            await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ 
+                texto: novo, 
+                editado: true 
+            });
+            fecharModal();
+        }
+        
+        function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false }); input.value = ''; }
+        function obterChatId(a,b) { return a < b ? `${a}_${b}` : `${b}_${a}`; }
+        
+        async function fazerLogin() {
+            const email = document.getElementById('emailLogin').value, senha = document.getElementById('senhaLogin').value, err = document.getElementById('erroLogin');
+            if (!email || !senha) { err.style.display='block'; err.innerText='Preencha e-mail e senha'; return; }
+            err.style.display='none';
+            try {
+                const r = await auth.signInWithEmailAndPassword(email, senha);
+                const d = await db.collection('usuarios').doc(r.user.uid).get();
+                usuarioAtual = { id: r.user.uid, nome: d.data()?.nome || email.split('@')[0], email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
+                renderizar();
+            } catch(e) { err.style.display='block'; err.innerText=e.message; }
+        }
+        
+        async function fazerCadastro() {
+            const nome = document.getElementById('nome').value, email = document.getElementById('email').value, idUnico = document.getElementById('idUnico').value, prof = document.getElementById('profissao').value, bio = document.getElementById('bio').value, senha = document.getElementById('senha').value, err = document.getElementById('erroCadastro'), suc = document.getElementById('sucessoCadastro');
+            err.style.display='none'; suc.style.display='none';
+            if (!nome || !email || !senha || !idUnico) { err.style.display='block'; err.innerText='Preencha todos os campos'; return; }
+            if (senha.length < 6) { err.style.display='block'; err.innerText='Senha mínimo 6'; return; }
+            const existe = await db.collection('usuarios').where('idUnico', '==', idUnico).get();
+            if (!existe.empty) { err.style.display='block'; err.innerText='ID já em uso'; return; }
+            try {
+                const r = await auth.createUserWithEmailAndPassword(email, senha);
+                await db.collection('usuarios').doc(r.user.uid).set({ nome, email, idUnico, profissao: prof || '', bio: bio || '', criadoEm: new Date(), online: true });
+                suc.style.display='block'; suc.innerText='Conta criada! ID: '+idUnico;
+                usuarioAtual = { id: r.user.uid, nome, email, idUnico, profissao: prof || '', bio: bio || '' };
+                setTimeout(() => renderizar(), 1500);
+            } catch(e) { err.style.display='block'; err.innerText=e.message; }
+        }
+        
+        async function fazerLogout() { 
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false });
+            await auth.signOut(); 
+            usuarioAtual = null; 
+            chatCom = null; 
+            renderizar(); 
+        }
+        
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const d = await db.collection('usuarios').doc(user.uid).get();
+                usuarioAtual = { id: user.uid, nome: d.data()?.nome || user.email.split('@')[0], email: user.email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
+                renderizar();
+            } else renderizar();
+        });
+    </script>
+</body>
+</html>
