@@ -31,6 +31,7 @@
         .usuario-nome { font-weight: 600; color: #0f172a; font-size: 15px; display: flex; align-items: center; gap: 6px; }
         .usuario-profissao { font-size: 11px; color: #3b82f6; margin-top: 2px; }
         .ultima-msg { font-size: 11px; color: #64748b; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+        .visto-info { font-size: 10px; color: #94a3b8; margin-top: 2px; }
         .chat-header { background: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%); color: white; padding: 15px 20px; display: flex; align-items: center; }
         .chat-header-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .chat-avatar { width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; position: relative; }
@@ -68,14 +69,15 @@
         .modal-conteudo button { padding: 8px 16px; margin: 5px; border: none; border-radius: 10px; cursor: pointer; }
         .btn-salvar { background: #3b82f6; color: white; }
         .btn-cancelar { background: #f1f5f9; color: #64748b; }
-        .som-btn { background: #64748b; border: none; color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; margin-left: 10px; }
         .profile-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1002; display: none; }
         .profile-card { background: white; border-radius: 24px; padding: 24px; width: 85%; max-width: 320px; text-align: center; }
-        .profile-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 32px; margin: 0 auto 15px; }
+        .profile-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 32px; margin: 0 auto 15px; cursor: pointer; }
         .profile-name { font-size: 20px; font-weight: 700; color: #1e293b; }
         .profile-profession { font-size: 14px; color: #3b82f6; margin: 5px 0; }
         .profile-bio { font-size: 14px; color: #475569; margin: 15px 0; padding: 10px; background: #f8fafc; border-radius: 12px; }
         .profile-close { background: #e2e8f0; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 10px; }
+        .editar-perfil-btn { background: #3b82f6; color: white; border: none; padding: 10px; border-radius: 20px; cursor: pointer; margin-top: 10px; width: 100%; }
+        .btn-perfil { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-right: 8px; }
         @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
     </style>
 </head>
@@ -84,7 +86,7 @@
     <div id="menuContexto" class="menu-contexto"></div>
     <div id="modalEditar" class="modal-editar">
         <div class="modal-conteudo">
-            <h3>✏️ Editar</h3>
+            <h3>✏️ Editar mensagem</h3>
             <input type="text" id="editarTexto">
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button class="btn-salvar" onclick="salvarEdicao()">Salvar</button>
@@ -116,33 +118,9 @@
         let prestadorIdUrl = new URLSearchParams(window.location.search).get('p');
         let mensagemSelecionada = null;
         let audioCtx = null;
-        let somAtivo = false;
+        let somAtivo = true;
         let onlineListeners = [];
         let menuAtivo = false;
-        
-        // ==================== STATUS ONLINE ====================
-        function atualizarStatusOnline(userId, status) {
-            db.collection('usuarios').doc(userId).update({ online: status, ultimoAcesso: new Date() }).catch(e => console.log);
-        }
-        
-        function iniciarStatusOnline() {
-            if (!usuarioAtual) return;
-            atualizarStatusOnline(usuarioAtual.id, true);
-            window.addEventListener('beforeunload', () => atualizarStatusOnline(usuarioAtual.id, false));
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) atualizarStatusOnline(usuarioAtual.id, false);
-                else atualizarStatusOnline(usuarioAtual.id, true);
-            });
-            setInterval(() => atualizarStatusOnline(usuarioAtual.id, true), 30000);
-        }
-        
-        function escutarStatusOnline(userId, callback) {
-            const unsubscribe = db.collection('usuarios').doc(userId).onSnapshot(doc => {
-                if (doc.exists) callback(doc.data().online || false);
-            });
-            onlineListeners.push(unsubscribe);
-            return unsubscribe;
-        }
         
         // ==================== SOM ====================
         function tocarSom() {
@@ -162,26 +140,67 @@
             } catch(e) { console.log('Som:', e); }
         }
         
-        function ativarSom() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            audioCtx.resume();
-            somAtivo = true;
-            tocarSom();
-            alert('🔊 Som ativado!');
+        function alternarSom() {
+            somAtivo = !somAtivo;
+            const btnSom = document.getElementById('btnSom');
+            if (btnSom) btnSom.innerHTML = somAtivo ? '🔊 Som' : '🔇 Silenciar';
+            if (somAtivo) tocarSom();
+        }
+        
+        // ==================== STATUS ONLINE ====================
+        function atualizarStatusOnline(userId, status) {
+            db.collection('usuarios').doc(userId).update({ online: status, ultimoAcesso: new Date() }).catch(e => console.log);
+        }
+        
+        function iniciarStatusOnline() {
+            if (!usuarioAtual) return;
+            atualizarStatusOnline(usuarioAtual.id, true);
+            window.addEventListener('beforeunload', () => atualizarStatusOnline(usuarioAtual.id, false));
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) atualizarStatusOnline(usuarioAtual.id, false);
+                else atualizarStatusOnline(usuarioAtual.id, true);
+            });
+            setInterval(() => atualizarStatusOnline(usuarioAtual.id, true), 30000);
+        }
+        
+        function escutarStatusOnline(userId, callback) {
+            const unsubscribe = db.collection('usuarios').doc(userId).onSnapshot(doc => {
+                if (doc.exists) callback(doc.data().online || false, doc.data().ultimoAcesso || null);
+            });
+            onlineListeners.push(unsubscribe);
+            return unsubscribe;
+        }
+        
+        function formatarUltimoAcesso(data) {
+            if (!data) return 'visto agora pouco';
+            const date = data.toDate();
+            const agora = new Date();
+            const diff = agora - date;
+            const minutos = Math.floor(diff / 60000);
+            if (minutos < 1) return 'visto agora pouco';
+            if (minutos < 60) return `visto há ${minutos} min`;
+            if (minutos < 1440) return `visto há ${Math.floor(minutos / 60)} h`;
+            return `visto em ${date.toLocaleDateString()}`;
         }
         
         // ==================== PERFIL ====================
-        function mostrarPerfil(usuario) {
+        function mostrarPerfil(usuario, isOwnProfile = false) {
             const modal = document.getElementById('profileModal');
             const card = document.getElementById('profileCard');
+            const ultimoAcesso = usuario.ultimoAcesso ? formatarUltimoAcesso(usuario.ultimoAcesso) : 'visto agora pouco';
+            
+            let botoes = '';
+            if (isOwnProfile) {
+                botoes = `<button class="editar-perfil-btn" onclick="abrirEditarPerfil()">✏️ Editar meu perfil</button>`;
+            }
+            
             card.innerHTML = `
-                <div class="profile-avatar">${(usuario.nome || '?').charAt(0).toUpperCase()}</div>
+                <div class="profile-avatar" onclick="${isOwnProfile ? 'abrirEditarPerfil()' : ''}">${(usuario.nome || '?').charAt(0).toUpperCase()}</div>
                 <div class="profile-name">${escapeHtml(usuario.nome || '')}</div>
                 <div class="profile-profession">${escapeHtml(usuario.profissao || 'Profissão não informada')}</div>
                 <div class="profile-bio">📝 ${escapeHtml(usuario.bio || 'Nenhuma bio cadastrada')}</div>
-                <div style="font-size:12px; color:#64748b; margin:10px 0;">
-                    ${usuario.online ? '🟢 Online agora' : '⚫ Offline'}
-                </div>
+                <div style="font-size:12px; color:#64748b; margin:5px 0;">${usuario.online ? '🟢 Online agora' : '⚫ ' + ultimoAcesso}</div>
+                ${botoes}
                 <button class="profile-close" onclick="fecharPerfil()">Fechar</button>
             `;
             modal.style.display = 'flex';
@@ -189,6 +208,70 @@
         
         function fecharPerfil() {
             document.getElementById('profileModal').style.display = 'none';
+        }
+        
+        function abrirEditarPerfil() {
+            fecharPerfil();
+            mostrarTelaEditarPerfil();
+        }
+        
+        function mostrarTelaEditarPerfil() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="app">
+                    <div class="header">
+                        <button class="btn-voltar" onclick="voltarDaEdicao()">←</button>
+                        <h1>Editar Perfil</h1>
+                        <div></div>
+                    </div>
+                    <div style="flex:1; padding: 20px;">
+                        <div class="form-card">
+                            <div class="profile-avatar" style="margin:0 auto 20px auto; width:80px; height:80px; font-size:32px; cursor:default;">${(usuarioAtual.nome || '?').charAt(0).toUpperCase()}</div>
+                            <div class="form-group">
+                                <label>Nome</label>
+                                <input type="text" id="editNome" value="${escapeHtml(usuarioAtual.nome || '')}" placeholder="Seu nome">
+                            </div>
+                            <div class="form-group">
+                                <label>Profissão</label>
+                                <input type="text" id="editProfissao" value="${escapeHtml(usuarioAtual.profissao || '')}" placeholder="Sua profissão">
+                            </div>
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea id="editBio" rows="4" placeholder="Fale sobre você">${escapeHtml(usuarioAtual.bio || '')}</textarea>
+                            </div>
+                            <button onclick="salvarPerfil()">Salvar alterações</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function voltarDaEdicao() {
+            renderizar();
+        }
+        
+        async function salvarPerfil() {
+            const novoNome = document.getElementById('editNome').value.trim();
+            const novaProfissao = document.getElementById('editProfissao').value.trim();
+            const novaBio = document.getElementById('editBio').value.trim();
+            
+            if (!novoNome) {
+                alert('Nome não pode ficar vazio');
+                return;
+            }
+            
+            await db.collection('usuarios').doc(usuarioAtual.id).update({
+                nome: novoNome,
+                profissao: novaProfissao,
+                bio: novaBio
+            });
+            
+            usuarioAtual.nome = novoNome;
+            usuarioAtual.profissao = novaProfissao;
+            usuarioAtual.bio = novaBio;
+            
+            alert('Perfil atualizado!');
+            renderizar();
         }
         
         // ==================== FUNÇÕES PRINCIPAIS ====================
@@ -212,7 +295,7 @@
             } else {
                 app.innerHTML = `
                     <div class="app">
-                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="som-btn" onclick="ativarSom()">🔊 Som</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div>
+                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="btn-perfil" onclick="mostrarPerfil(usuarioAtual, true)">👤 Perfil</button><button id="btnSom" class="som-btn" onclick="alternarSom()">${somAtivo ? '🔊 Som' : '🔇 Silenciar'}</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div>
                         <div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div>
                     </div>
                 `;
@@ -260,7 +343,7 @@
                             <div class="chat-avatar" id="chatAvatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div>
                             <div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div>
                         </div>
-                        <button class="som-btn" onclick="ativarSom()">🔊</button>
+                        <button id="btnSomChat" class="som-btn" onclick="alternarSom()">${somAtivo ? '🔊 Som' : '🔇 Silenciar'}</button>
                     </div>
                     <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
                     <div class="input-area"><textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea><button class="btn-enviar" onclick="enviarMsg()">➤</button></div>
@@ -268,10 +351,13 @@
             document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
             carregarMensagens();
             
-            escutarStatusOnline(chatCom.id, (online) => {
+            escutarStatusOnline(chatCom.id, (online, ultimoAcesso) => {
                 const statusText = document.getElementById('chatStatus');
                 const statusDot = document.getElementById('chatStatusDot');
-                if (statusText) statusText.innerText = online ? '🟢 Online' : '⚫ Offline';
+                if (statusText) {
+                    if (online) statusText.innerText = '🟢 Online';
+                    else statusText.innerText = `⚫ ${formatarUltimoAcesso(ultimoAcesso)}`;
+                }
                 if (statusDot) statusDot.className = online ? 'status-online' : 'status-offline';
             });
         }
@@ -319,101 +405,38 @@
             });
         }
         
-        // ========== MENU CORRIGIDO ==========
+        // ========== MENU ==========
         function abrirMenu(event, id, texto, enviada) {
             event.stopPropagation();
             if (!enviada) return;
-            
             mensagemSelecionada = { id, texto };
-            
-            if (menuAtivo) {
-                fecharMenu();
-            }
-            
+            if (menuAtivo) fecharMenu();
             const menu = document.getElementById('menuContexto');
             menu.innerHTML = '';
-            
             const btnEditar = document.createElement('button');
             btnEditar.textContent = '✏️ Editar';
-            btnEditar.onclick = (e) => {
-                e.stopPropagation();
-                fecharMenu();
-                editarMsg();
-            };
-            
+            btnEditar.onclick = (e) => { e.stopPropagation(); fecharMenu(); editarMsg(); };
             const btnApagar = document.createElement('button');
             btnApagar.textContent = '🗑️ Apagar';
-            btnApagar.onclick = (e) => {
-                e.stopPropagation();
-                fecharMenu();
-                apagarMsg();
-            };
-            
+            btnApagar.onclick = (e) => { e.stopPropagation(); fecharMenu(); apagarMsg(); };
             menu.appendChild(btnEditar);
             menu.appendChild(btnApagar);
-            
             let x, y;
-            if (event.touches) {
-                x = event.touches[0].clientX;
-                y = event.touches[0].clientY;
-            } else {
-                x = event.clientX;
-                y = event.clientY;
-            }
-            
+            if (event.touches) { x = event.touches[0].clientX; y = event.touches[0].clientY; } 
+            else { x = event.clientX; y = event.clientY; }
             menu.style.display = 'block';
             menu.style.left = (x - 80) + 'px';
             menu.style.top = (y - 40) + 'px';
             menuAtivo = true;
-            
-            const fecharFora = (e) => {
-                if (!menu.contains(e.target)) {
-                    fecharMenu();
-                    document.removeEventListener('click', fecharFora);
-                    document.removeEventListener('touchstart', fecharFora);
-                }
-            };
-            
-            setTimeout(() => {
-                document.addEventListener('click', fecharFora);
-                document.addEventListener('touchstart', fecharFora);
-            }, 100);
+            const fecharFora = (e) => { if (!menu.contains(e.target)) { fecharMenu(); document.removeEventListener('click', fecharFora); document.removeEventListener('touchstart', fecharFora); } };
+            setTimeout(() => { document.addEventListener('click', fecharFora); document.addEventListener('touchstart', fecharFora); }, 100);
         }
         
-        function fecharMenu() {
-            const menu = document.getElementById('menuContexto');
-            menu.style.display = 'none';
-            menu.innerHTML = '';
-            menuAtivo = false;
-        }
-        
-        function editarMsg() {
-            document.getElementById('editarTexto').value = mensagemSelecionada.texto;
-            document.getElementById('modalEditar').style.display = 'flex';
-        }
-        
-        function apagarMsg() {
-            if (confirm('Apagar esta mensagem?')) {
-                const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-                db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).delete();
-            }
-        }
-        
-        function fecharModal() {
-            document.getElementById('modalEditar').style.display = 'none';
-        }
-        
-        async function salvarEdicao() {
-            const novo = document.getElementById('editarTexto').value.trim();
-            if (!novo) return;
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ 
-                texto: novo, 
-                editado: true 
-            });
-            fecharModal();
-        }
-        
+        function fecharMenu() { const menu = document.getElementById('menuContexto'); menu.style.display = 'none'; menu.innerHTML = ''; menuAtivo = false; }
+        function editarMsg() { document.getElementById('editarTexto').value = mensagemSelecionada.texto; document.getElementById('modalEditar').style.display = 'flex'; }
+        function apagarMsg() { if (confirm('Apagar esta mensagem?')) { const chatId = obterChatId(usuarioAtual.id, chatCom.id); db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).delete(); } }
+        function fecharModal() { document.getElementById('modalEditar').style.display = 'none'; }
+        async function salvarEdicao() { const novo = document.getElementById('editarTexto').value.trim(); if (!novo) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ texto: novo, editado: true }); fecharModal(); }
         function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
         async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false }); input.value = ''; }
         function obterChatId(a,b) { return a < b ? `${a}_${b}` : `${b}_${a}`; }
