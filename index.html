@@ -90,7 +90,6 @@
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
         
-        /* Mensagem selecionada com destaque escuro e check */
         .mensagem-selecionada .mensagem-bolha {
             background: var(--accent-dark) !important;
             color: white !important;
@@ -518,23 +517,29 @@
         
         async function apagarTudo() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
+            const msgs = await db.collection('chats').doc(chatId).collection('mensagens')
+                .where('remetenteId', '==', usuarioAtual.id).get();
             
             if (msgs.empty) {
-                alert('Nenhuma mensagem para apagar.');
+                alert('Você não tem mensagens para apagar.');
                 return;
             }
             
-            if (confirm(`Apagar TODAS as mensagens desta conversa? (${msgs.size} mensagens)`)) {
-                const promises = [];
-                msgs.forEach(d => promises.push(d.ref.delete()));
-                await Promise.all(promises);
+            if (confirm(`Apagar TODAS as suas mensagens desta conversa apenas para você? (${msgs.size} mensagens)`)) {
+                for (const doc of msgs.docs) {
+                    const data = doc.data();
+                    const apagadoPor = data.apagadoPor || [];
+                    if (!apagadoPor.includes(usuarioAtual.id)) {
+                        apagadoPor.push(usuarioAtual.id);
+                        await doc.ref.update({ apagadoPor: apagadoPor });
+                    }
+                }
                 mensagensSelecionadas.clear();
                 modoSelecao = false;
                 atualizarBarraSelecao();
                 const menu = document.getElementById('menuContexto');
                 menu.style.display = 'none';
-                alert('Todas as mensagens foram apagadas!');
+                alert('Suas mensagens foram apagadas apenas para você!');
             }
         }
         
@@ -554,12 +559,19 @@
                 return;
             }
             
-            if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s)?`)) {
-                const promises = [];
+            if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s) apenas para você?`)) {
                 for (const id of mensagensParaApagar) {
-                    promises.push(db.collection('chats').doc(chatId).collection('mensagens').doc(id).delete());
+                    const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(id);
+                    const doc = await msgRef.get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const apagadoPor = data.apagadoPor || [];
+                        if (!apagadoPor.includes(usuarioAtual.id)) {
+                            apagadoPor.push(usuarioAtual.id);
+                            await msgRef.update({ apagadoPor: apagadoPor });
+                        }
+                    }
                 }
-                await Promise.all(promises);
                 mensagensSelecionadas.clear();
                 modoSelecao = false;
                 atualizarBarraSelecao();
@@ -588,13 +600,28 @@
                 snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
                 if (msgs.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
                 msgs.sort((a,b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
-                const ultima = msgs[msgs.length - 1];
-                if (ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
+                
+                // Filtrar mensagens que NÃO foram apagadas pelo usuário atual
+                const msgsVisiveis = msgs.filter(m => {
+                    if (m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id)) {
+                        return false;
+                    }
+                    return true;
+                });
+                
+                const ultima = msgsVisiveis[msgsVisiveis.length - 1];
+                if (ultima && ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
                     mostrarNotificacaoLocal(`💼 ${chatCom.nome}`, ultima.texto);
                     tocarSom();
                     ultimaMsgId = ultima.id;
                 }
-                container.innerHTML = msgs.map(m => {
+                
+                if (msgsVisiveis.length === 0) { 
+                    container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; 
+                    return; 
+                }
+                
+                container.innerHTML = msgsVisiveis.map(m => {
                     const enviada = m.remetenteId === usuarioAtual.id;
                     let hora = '';
                     if (m.timestamp) hora = m.timestamp.toDate().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
@@ -777,7 +804,7 @@
         
         async function apagarMsg() { 
             document.getElementById('menuContexto').style.display = 'none'; 
-            if (confirm('Apagar esta mensagem?')) { 
+            if (confirm('Apagar esta mensagem apenas para você?')) { 
                 const msgElements = document.querySelectorAll('.mensagem');
                 for (let el of msgElements) {
                     if (el.getAttribute('data-id') === mensagemSelecionada.id) {
@@ -787,7 +814,16 @@
                 }
                 setTimeout(async () => {
                     const chatId = obterChatId(usuarioAtual.id, chatCom.id); 
-                    await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).delete();
+                    const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id);
+                    const doc = await msgRef.get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const apagadoPor = data.apagadoPor || [];
+                        if (!apagadoPor.includes(usuarioAtual.id)) {
+                            apagadoPor.push(usuarioAtual.id);
+                            await msgRef.update({ apagadoPor: apagadoPor });
+                        }
+                    }
                 }, 150);
             } 
         }
