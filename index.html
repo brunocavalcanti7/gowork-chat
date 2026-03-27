@@ -74,9 +74,18 @@
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
         .mensagem-texto a { color: inherit; text-decoration: underline; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
-        .mensagem-nome { font-size: 11px; font-weight: 500; margin-bottom: 4px; color: var(--accent); }
-        .mensagem.recebida .mensagem-nome { display: block; }
-        .mensagem.enviada .mensagem-nome { display: none; }
+        .mensagem-nome {
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .mensagem.enviada .mensagem-nome {
+            color: rgba(255, 255, 255, 0.8);
+            text-align: right;
+        }
+        .mensagem.recebida .mensagem-nome {
+            color: var(--accent);
+        }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
         
@@ -86,13 +95,14 @@
             font-weight: bold;
         }
         .visto-enviado {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.8);
         }
         .visto-lido {
-            color: #60a5fa;
+            color: #ffffff;
+            text-shadow: 0 0 1px rgba(0,0,0,0.3);
         }
         body.dark .visto-lido {
-            color: #60a5fa;
+            color: #ffffff;
         }
         
         .mensagem-selecionada .mensagem-bolha {
@@ -190,59 +200,83 @@
         
         .emoji-picker {
             position: fixed;
-            bottom: 80px;
+            bottom: 0;
             left: 0;
             right: 0;
             background: var(--bg-secondary);
             border-radius: 24px 24px 0 0;
-            padding: 15px;
+            padding: 16px;
             display: none;
             z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 -4px 25px rgba(0,0,0,0.15);
             border-top: 1px solid var(--border);
-            max-height: 400px;
-            overflow-y: auto;
+            max-height: 65vh;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease;
         }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
         .emoji-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
         .emoji-header span {
             font-weight: 600;
+            font-size: 16px;
             color: var(--accent);
         }
         .emoji-header button {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             color: var(--text-secondary);
             padding: 5px 10px;
-            border-radius: 20px;
+            border-radius: 30px;
+            transition: all 0.2s;
         }
+        .emoji-header button:active {
+            background: var(--bg-primary);
+        }
+        
         .emoji-categorias {
             display: flex;
             gap: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             overflow-x: auto;
             white-space: nowrap;
             padding-bottom: 8px;
             scrollbar-width: thin;
+            flex-shrink: 0;
         }
         .emoji-categorias::-webkit-scrollbar {
             height: 3px;
         }
+        .emoji-categorias::-webkit-scrollbar-track {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .emoji-categorias::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
         .emoji-cat-btn {
             background: var(--bg-primary);
             border: none;
-            padding: 8px 16px;
+            padding: 8px 18px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 500;
             color: var(--text-secondary);
             transition: all 0.2s;
             white-space: nowrap;
@@ -251,20 +285,24 @@
             background: var(--accent);
             color: white;
         }
+        
+        .emoji-grid-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
         .emoji-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(45px, 55px));
-            gap: 8px;
-            max-height: 280px;
-            overflow-y: auto;
-            padding: 5px;
+            grid-template-columns: repeat(auto-fill, minmax(48px, 58px));
+            gap: 6px;
+            padding-bottom: 10px;
         }
         .emoji {
-            font-size: 28px;
+            font-size: 32px;
             cursor: pointer;
             padding: 8px;
             text-align: center;
-            border-radius: 12px;
+            border-radius: 14px;
             transition: all 0.1s;
             background: var(--bg-primary);
         }
@@ -373,6 +411,9 @@
         let tema = localStorage.getItem('tema') || 'claro';
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
         
+        // Navegação por pilha (stack)
+        let navigationStack = [];
+        
         const emojisData = {
             '😀 Sorrisos': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
             '❤️ Corações': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '💌', '💋'],
@@ -384,6 +425,22 @@
         };
         
         let categoriaAtual = '😀 Sorrisos';
+        
+        function pushNavigation(state) {
+            navigationStack.push(state);
+            history.pushState(state, null, location.href);
+        }
+        
+        function popNavigation() {
+            if (navigationStack.length > 0) {
+                const lastState = navigationStack.pop();
+                if (lastState.type === 'chat') {
+                    voltar();
+                } else if (lastState.type === 'emoji') {
+                    fecharEmojiPicker();
+                }
+            }
+        }
         
         function aplicarTema() {
             if (tema === 'escuro') document.body.classList.add('dark');
@@ -402,19 +459,20 @@
         function mostrarEmojis(targetInputId) {
             const picker = document.getElementById('emojiPicker');
             if (picker.style.display === 'flex') {
-                picker.style.display = 'none';
+                fecharEmojiPicker();
                 return;
             }
             atualizarEmojiPicker(targetInputId);
             picker.style.display = 'flex';
             picker.dataset.target = targetInputId;
+            pushNavigation({ type: 'emoji' });
         }
         
         function atualizarEmojiPicker(targetId) {
             const picker = document.getElementById('emojiPicker');
             let html = `
                 <div class="emoji-header">
-                    <span>😀 Emojis</span>
+                    <span>😀 Escolha um emoji</span>
                     <button onclick="fecharEmojiPicker()">✖️</button>
                 </div>
                 <div class="emoji-categorias" id="emojiCategorias">
@@ -422,11 +480,11 @@
             for (const cat of Object.keys(emojisData)) {
                 html += `<button class="emoji-cat-btn ${cat === categoriaAtual ? 'active' : ''}" onclick="mudarCategoriaEmoji('${cat}', '${targetId}')">${cat}</button>`;
             }
-            html += `</div><div class="emoji-grid" id="emojiGrid">`;
+            html += `</div><div class="emoji-grid-container" id="emojiGridContainer"><div class="emoji-grid" id="emojiGrid">`;
             emojisData[categoriaAtual].forEach(e => {
                 html += `<span class="emoji" onclick="inserirEmoji('${e}', '${targetId}')">${e}</span>`;
             });
-            html += `</div>`;
+            html += `</div></div>`;
             picker.innerHTML = html;
             
             setTimeout(() => {
@@ -447,6 +505,9 @@
         
         function fecharEmojiPicker() {
             document.getElementById('emojiPicker').style.display = 'none';
+            if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'emoji') {
+                navigationStack.pop();
+            }
         }
         
         function inserirEmoji(emoji, targetId) {
@@ -633,17 +694,6 @@
         function fecharModalEditar() { document.getElementById('modalEditar').style.display = 'none'; }
         function fecharModalResponder() { document.getElementById('modalResponder').style.display = 'none'; respondendoMsg = null; }
         
-        function handleBackButton() {
-            if (chatCom) {
-                voltar();
-            } else {
-                // Se estiver na tela principal, pode fechar o app ou voltar
-                if (confirm('Deseja sair do GOWORK CHAT?')) {
-                    window.close();
-                }
-            }
-        }
-        
         function renderizar() {
             const app = document.getElementById('app');
             if (!usuarioAtual) {
@@ -673,10 +723,16 @@
                 document.getElementById('btnEntrar').onclick = () => { document.getElementById('telaEntrar').style.display='block'; document.getElementById('telaCadastrar').style.display='none'; document.getElementById('btnEntrar').classList.add('active'); document.getElementById('btnCadastrar').classList.remove('active'); };
                 document.getElementById('btnCadastrar').onclick = () => { document.getElementById('telaEntrar').style.display='none'; document.getElementById('telaCadastrar').style.display='block'; document.getElementById('btnCadastrar').classList.add('active'); document.getElementById('btnEntrar').classList.remove('active'); };
                 document.getElementById('idGerado').innerText = gerarIdAleatorio();
+                if (navigationStack.length === 0) {
+                    pushNavigation({ type: 'home' });
+                }
             } else {
                 app.innerHTML = `<div class="app"><div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="btn-icon" onclick="mostrarConfiguracoes()">⚙️</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div><div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div></div>`;
                 carregarListas();
                 iniciarStatusOnline();
+                if (navigationStack.length === 0) {
+                    pushNavigation({ type: 'home' });
+                }
             }
         }
         
@@ -740,6 +796,8 @@
                 if (status) status.innerText = online ? '🟢 Online' : `⚫ ${formatarUltimoAcesso(doc.data().ultimoAcesso)}`;
                 if (dot) dot.className = online ? 'status-online' : 'status-offline';
             });
+            
+            pushNavigation({ type: 'chat', id: id });
         }
         
         async function marcarMensagensComoLidas() {
@@ -866,7 +924,14 @@
             }
         }
         
-        function voltar() { if (unsubscribeMessages) unsubscribeMessages(); chatCom = null; renderizar(); }
+        function voltar() { 
+            if (unsubscribeMessages) unsubscribeMessages(); 
+            chatCom = null; 
+            renderizar();
+            if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'chat') {
+                navigationStack.pop();
+            }
+        }
         
         let ultimaMsgId = null;
         
@@ -937,7 +1002,7 @@
                             }
                         }
                         
-                        const nomeRemetente = !enviada ? `<div class="mensagem-nome">${escapeHtml(chatCom.nome)}</div>` : '';
+                        const nomeRemetente = `<div class="mensagem-nome">${escapeHtml(enviada ? 'Você' : chatCom.nome)}</div>`;
                         
                         html += `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}" data-lido="${m.lido ? 'true' : 'false'}"
                             onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
@@ -1084,12 +1149,14 @@
         
         async function fazerLogout() { if (unsubscribeMessages) unsubscribeMessages(); if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false }); await auth.signOut(); usuarioAtual = null; renderizar(); }
         
-        // Botão voltar físico do celular
+        // Gerenciar botão voltar do celular
         window.addEventListener('popstate', function(event) {
-            if (chatCom) {
-                voltar();
-                history.pushState(null, null, location.href);
+            const emojiPicker = document.getElementById('emojiPicker');
+            if (emojiPicker && emojiPicker.style.display === 'flex') {
+                fecharEmojiPicker();
+                return;
             }
+            popNavigation();
         });
         
         auth.onAuthStateChanged(async user => {
