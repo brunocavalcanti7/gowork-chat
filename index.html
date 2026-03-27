@@ -74,6 +74,7 @@
         .mensagem.enviada .mensagem-bolha { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
         .mensagem.recebida .mensagem-bolha { background: var(--bg-secondary); color: var(--text-primary); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
+        .mensagem-texto a { color: inherit; text-decoration: underline; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
@@ -290,6 +291,16 @@
             document.getElementById('emojiPicker').style.display = 'none';
         }
         
+        function copiarMensagem() {
+            const texto = mensagemSelecionada.texto;
+            navigator.clipboard.writeText(texto).then(() => {
+                alert('Mensagem copiada!');
+            }).catch(() => {
+                alert('Não foi possível copiar');
+            });
+            document.getElementById('menuContexto').style.display = 'none';
+        }
+        
         function compartilharLocalizacao() {
             if (!navigator.geolocation) {
                 alert('Seu navegador não suporta geolocalização.');
@@ -298,7 +309,7 @@
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                const mapaUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                const mapaUrl = `https://www.google.com/maps?q=${lat},${lng}&hl=pt-BR`;
                 const texto = `📍 Localização: ${mapaUrl}`;
                 const chatId = obterChatId(usuarioAtual.id, chatCom.id);
                 await db.collection('chats').doc(chatId).collection('mensagens').add({
@@ -306,7 +317,10 @@
                     remetenteId: usuarioAtual.id,
                     destinatarioId: chatCom.id,
                     timestamp: new Date(),
-                    editado: false
+                    editado: false,
+                    tipo: 'localizacao',
+                    lat: lat,
+                    lng: lng
                 });
             }, () => {
                 alert('Não foi possível obter sua localização.');
@@ -654,13 +668,20 @@
                         const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
                         const selecionada = mensagensSelecionadas.has(m.id);
                         const respostaHtml = m.resposta ? `<div class="mensagem-resposta">↩️ ${escapeHtml(m.resposta.autor)}: ${escapeHtml(m.resposta.texto)}</div>` : '';
+                        
+                        let conteudo = escapeHtml(m.texto);
+                        if (m.tipo === 'localizacao' && m.lat && m.lng) {
+                            const mapaLink = `https://www.google.com/maps?q=${m.lat},${m.lng}&hl=pt-BR`;
+                            conteudo = `<a href="${mapaLink}" target="_blank" style="color: inherit; text-decoration: underline;">📍 Ver localização no mapa</a>`;
+                        }
+                        
                         return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}"
                             onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
                             oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
                             ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
                             ontouchend="cancelarPressionar()"
                             ontouchmove="cancelarPressionar()">
-                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
+                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
                     }).join('');
                     container.scrollTop = container.scrollHeight;
                 });
@@ -688,7 +709,7 @@
             if (!enviada) {
                 mensagemSelecionada = { id, texto };
                 const menu = document.getElementById('menuContexto');
-                menu.innerHTML = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>`;
+                menu.innerHTML = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button><button onclick="copiarMensagem()">📋 Copiar</button>`;
                 let x = event.touches ? event.touches[0].clientX : event.clientX;
                 let y = event.touches ? event.touches[0].clientY : event.clientY;
                 menu.style.display = 'block';
@@ -701,6 +722,7 @@
             const menu = document.getElementById('menuContexto');
             menu.innerHTML = `
                 <button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>
+                <button onclick="copiarMensagem()">📋 Copiar</button>
                 <button onclick="editarMsg()">✏️ Editar</button>
                 <button onclick="apagarMsg()">🗑️ Apagar para mim</button>
                 <button onclick="apagarParaTodos()">🗑️ Apagar para todos</button>
