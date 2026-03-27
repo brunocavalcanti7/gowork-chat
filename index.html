@@ -74,6 +74,9 @@
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
         .mensagem-texto a { color: inherit; text-decoration: underline; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
+        .mensagem-nome { font-size: 11px; font-weight: 500; margin-bottom: 4px; color: var(--accent); }
+        .mensagem.recebida .mensagem-nome { display: block; }
+        .mensagem.enviada .mensagem-nome { display: none; }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
         
@@ -116,12 +119,73 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-        .input-area { padding: 12px 15px; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .input-wrapper { flex: 1; display: flex; gap: 8px; align-items: flex-end; }
-        .input-mensagem { flex: 1; padding: 10px 15px; border: 1px solid var(--border); border-radius: 24px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg-primary); color: var(--text-primary); max-height: 100px; }
-        .input-mensagem:focus { outline: none; border-color: var(--accent); }
-        .btn-input { background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
-        .btn-enviar { background: var(--accent); border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .input-area {
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 4px 8px;
+            border: 1px solid var(--border);
+        }
+        .input-mensagem {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: transparent;
+            color: var(--text-primary);
+            max-height: 100px;
+        }
+        .input-mensagem:focus {
+            outline: none;
+        }
+        .btn-input {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .btn-input:active {
+            transform: scale(0.95);
+            background: var(--bg-primary);
+        }
+        .btn-enviar {
+            background: var(--accent);
+            border: none;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .btn-enviar:active {
+            transform: scale(0.95);
+        }
         .resposta-preview { background: var(--bg-primary); padding: 8px 15px; border-left: 3px solid var(--accent); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
         
         .emoji-picker {
@@ -171,14 +235,6 @@
         }
         .emoji-categorias::-webkit-scrollbar {
             height: 3px;
-        }
-        .emoji-categorias::-webkit-scrollbar-track {
-            background: var(--border);
-            border-radius: 10px;
-        }
-        .emoji-categorias::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
         }
         .emoji-cat-btn {
             background: var(--bg-primary);
@@ -577,6 +633,17 @@
         function fecharModalEditar() { document.getElementById('modalEditar').style.display = 'none'; }
         function fecharModalResponder() { document.getElementById('modalResponder').style.display = 'none'; respondendoMsg = null; }
         
+        function handleBackButton() {
+            if (chatCom) {
+                voltar();
+            } else {
+                // Se estiver na tela principal, pode fechar o app ou voltar
+                if (confirm('Deseja sair do GOWORK CHAT?')) {
+                    window.close();
+                }
+            }
+        }
+        
         function renderizar() {
             const app = document.getElementById('app');
             if (!usuarioAtual) {
@@ -689,6 +756,42 @@
                 batch.update(doc.ref, { lido: true, lidoEm: new Date() });
             });
             await batch.commit();
+        }
+        
+        function observarMensagensParaLer() {
+            const container = document.getElementById('mensagensArea');
+            if (!container) return;
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const msgDiv = entry.target;
+                        const msgId = msgDiv.getAttribute('data-id');
+                        const isFromOther = !msgDiv.classList.contains('enviada');
+                        const jaLida = msgDiv.getAttribute('data-lido') === 'true';
+                        
+                        if (isFromOther && !jaLida && msgId) {
+                            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+                            db.collection('chats').doc(chatId).collection('mensagens').doc(msgId).update({
+                                lido: true,
+                                lidoEm: new Date()
+                            }).then(() => {
+                                msgDiv.setAttribute('data-lido', 'true');
+                                const horaSpan = msgDiv.querySelector('.mensagem-hora');
+                                if (horaSpan) {
+                                    const vistoIcon = horaSpan.querySelector('.visto-icon');
+                                    if (vistoIcon) {
+                                        vistoIcon.className = 'visto-icon visto-lido';
+                                        vistoIcon.innerHTML = '✓✓';
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.mensagem.recebida').forEach(msg => observer.observe(msg));
         }
         
         function abrirMenuChat() {
@@ -834,19 +937,22 @@
                             }
                         }
                         
-                        html += `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}" data-timestamp="${m.timestamp?.toDate().getTime() || 0}"
+                        const nomeRemetente = !enviada ? `<div class="mensagem-nome">${escapeHtml(chatCom.nome)}</div>` : '';
+                        
+                        html += `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}" data-lido="${m.lido ? 'true' : 'false'}"
                             onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
                             oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
                             ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
                             ontouchend="cancelarPressionar()"
                             ontouchmove="cancelarPressionar()">
-                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}${vistoIcon}</div></div></div>`;
+                            <div class="mensagem-bolha">${respostaHtml}${nomeRemetente}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}${vistoIcon}</div></div></div>`;
                     }
                     
                     container.innerHTML = html;
                     setTimeout(() => {
                         container.scrollTop = container.scrollHeight;
-                    }, 50);
+                        observarMensagensParaLer();
+                    }, 100);
                 });
         }
         
@@ -978,11 +1084,20 @@
         
         async function fazerLogout() { if (unsubscribeMessages) unsubscribeMessages(); if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false }); await auth.signOut(); usuarioAtual = null; renderizar(); }
         
+        // Botão voltar físico do celular
+        window.addEventListener('popstate', function(event) {
+            if (chatCom) {
+                voltar();
+                history.pushState(null, null, location.href);
+            }
+        });
+        
         auth.onAuthStateChanged(async user => {
             if (user) {
                 const d = await db.collection('usuarios').doc(user.uid).get();
                 usuarioAtual = { id: user.uid, nome: d.data()?.nome || user.email.split('@')[0], email: user.email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
                 aplicarTema(); renderizar();
+                history.pushState(null, null, location.href);
             } else renderizar();
         });
     </script>
