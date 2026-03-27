@@ -517,15 +517,14 @@
         
         async function apagarTudo() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const msgs = await db.collection('chats').doc(chatId).collection('mensagens')
-                .where('remetenteId', '==', usuarioAtual.id).get();
+            const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
             
             if (msgs.empty) {
-                alert('Você não tem mensagens para apagar.');
+                alert('Nenhuma mensagem para apagar.');
                 return;
             }
             
-            if (confirm(`Apagar TODAS as suas mensagens desta conversa apenas para você? (${msgs.size} mensagens)`)) {
+            if (confirm(`Apagar TODAS as mensagens desta conversa apenas para você? (${msgs.size} mensagens)`)) {
                 for (const doc of msgs.docs) {
                     const data = doc.data();
                     const apagadoPor = data.apagadoPor || [];
@@ -539,7 +538,7 @@
                 atualizarBarraSelecao();
                 const menu = document.getElementById('menuContexto');
                 menu.style.display = 'none';
-                alert('Suas mensagens foram apagadas apenas para você!');
+                alert('Todas as mensagens foram apagadas apenas para você!');
             }
         }
         
@@ -601,7 +600,6 @@
                 if (msgs.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
                 msgs.sort((a,b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
                 
-                // Filtrar mensagens que NÃO foram apagadas pelo usuário atual
                 const msgsVisiveis = msgs.filter(m => {
                     if (m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id)) {
                         return false;
