@@ -180,6 +180,24 @@
             transform: scale(0.95);
             background: var(--bg-primary);
         }
+        .btn-input {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .btn-input:active {
+            transform: scale(0.95);
+            background: var(--bg-primary);
+        }
         .btn-enviar {
             background: var(--accent);
             border: none;
@@ -793,6 +811,7 @@
                     <div class="input-wrapper">
                         <button class="btn-localizacao" onclick="compartilharLocalizacao()">📍</button>
                         <textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea>
+                        <button class="btn-input" onclick="mostrarEmojisPrincipal()">😀</button>
                     </div>
                     <button class="btn-enviar" onclick="enviarMsg()">➤</button>
                 </div>`;
