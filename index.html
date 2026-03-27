@@ -20,8 +20,6 @@
             --border: #e2e8f0;
             --accent: #3b82f6;
             --accent-dark: #2563eb;
-            --message-sent: #3b82f6;
-            --message-received: #ffffff;
             --header-bg: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%);
             --online: #22c55e;
             --offline: #94a3b8;
@@ -33,13 +31,11 @@
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --border: #334155;
-            --message-received: #334155;
         }
         
         body { background: linear-gradient(135deg, #0a2b3e 0%, #1a4a6f 100%); font-family: 'Inter', sans-serif; }
         .app { max-width: 600px; margin: 0 auto; background: var(--bg-secondary); height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.1); transition: all 0.3s; }
         
-        /* Header */
         .header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 8px; }
         .logo-icon { font-size: 24px; }
@@ -47,8 +43,8 @@
         .header span { color: #60a5fa; }
         .btn-icon { background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 18px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .btn-icon:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+        .btn-sair { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
         
-        /* Listas */
         .lista-usuarios { flex: 1; overflow-y: auto; padding: 8px; background: var(--bg-primary); }
         .secao { margin-bottom: 20px; }
         .secao-titulo { font-weight: 600; color: var(--text-primary); margin: 12px 12px 8px 12px; padding-bottom: 5px; border-bottom: 2px solid var(--accent); display: inline-block; font-size: 13px; }
@@ -62,21 +58,20 @@
         .usuario-profissao { font-size: 11px; color: var(--accent); margin-top: 2px; }
         .ultima-msg { font-size: 11px; color: var(--text-secondary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
         
-        /* Chat */
         .chat-header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; align-items: center; gap: 12px; }
         .chat-header-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .chat-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; position: relative; }
         .chat-nome { font-weight: 600; font-size: 16px; }
         .chat-status { font-size: 11px; opacity: 0.8; }
         .mensagens-area { flex: 1; overflow-y: auto; padding: 15px; background: var(--bg-primary); display: flex; flex-direction: column; }
-        .mensagem { margin-bottom: 12px; display: flex; width: 100%; animation: fadeInUp 0.2s ease; }
+        .mensagem { margin-bottom: 12px; display: flex; width: 100%; animation: fadeInUp 0.2s ease; user-select: none; -webkit-tap-highlight-color: transparent; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .mensagem.enviada { justify-content: flex-end; }
         .mensagem.recebida { justify-content: flex-start; }
         .mensagem-bolha { max-width: 75%; padding: 8px 14px; border-radius: 18px; word-wrap: break-word; cursor: pointer; transition: transform 0.1s; position: relative; }
         .mensagem-bolha:active { transform: scale(0.98); }
         .mensagem.enviada .mensagem-bolha { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
-        .mensagem.recebida .mensagem-bolha { background: var(--message-received); color: var(--text-primary); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .mensagem.recebida .mensagem-bolha { background: var(--bg-secondary); color: var(--text-primary); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
@@ -88,11 +83,8 @@
         .input-mensagem { flex: 1; padding: 10px 15px; border: 1px solid var(--border); border-radius: 24px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg-primary); color: var(--text-primary); }
         .input-mensagem:focus { outline: none; border-color: var(--accent); background: var(--bg-secondary); }
         .btn-enviar { background: var(--accent); border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-enviar:hover { transform: scale(1.05); }
         .resposta-preview { background: var(--bg-primary); padding: 8px 15px; border-left: 3px solid var(--accent); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
-        .resposta-preview button { background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-secondary); }
         
-        /* Modais e menus */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; backdrop-filter: blur(4px); }
         .modal-content { background: var(--bg-secondary); border-radius: 24px; padding: 24px; width: 90%; max-width: 350px; max-height: 80vh; overflow-y: auto; color: var(--text-primary); }
         .modal-content h3 { margin-bottom: 20px; }
@@ -111,8 +103,6 @@
         .error { color: #ef4444; font-size: 11px; margin-top: 5px; display: none; }
         .success { color: #10b981; font-size: 11px; margin-top: 5px; display: none; }
         
-        @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
-        
         .config-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
         .config-item label { font-weight: 500; }
         .toggle { width: 50px; height: 26px; background: var(--border); border-radius: 13px; cursor: pointer; position: relative; transition: 0.2s; }
@@ -127,14 +117,13 @@
         body.fonte-pequena { font-size: 12px; }
         body.fonte-normal { font-size: 14px; }
         body.fonte-grande { font-size: 16px; }
+        @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
     </style>
 </head>
 <body>
     <div id="app"></div>
     <div id="menuContexto" class="menu-contexto"></div>
-    <div id="modalConfig" class="modal">
-        <div class="modal-content" id="modalConfigContent"></div>
-    </div>
+    <div id="modalConfig" class="modal"><div class="modal-content" id="modalConfigContent"></div></div>
     <div id="modalEditar" class="modal">
         <div class="modal-content">
             <h3>✏️ Editar mensagem</h3>
@@ -187,8 +176,8 @@
         let modoSelecao = false;
         let mensagensSelecionadas = new Set();
         let respondendoMsg = null;
+        let pressionarTimeout = null;
         
-        // Configurações
         let tema = localStorage.getItem('tema') || 'claro';
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
         
@@ -199,7 +188,6 @@
             document.body.classList.add(`fonte-${tamanhoFonte}`);
         }
         
-        // ==================== SOM ====================
         function tocarSom() {
             if (!somAtivo) return;
             try {
@@ -217,7 +205,6 @@
             } catch(e) {}
         }
         
-        // ==================== NOTIFICAÇÕES ====================
         function mostrarNotificacaoLocal(titulo, corpo) {
             if (!notificacoesAtivas) return;
             if (Notification.permission === 'granted') {
@@ -235,7 +222,6 @@
             return false;
         }
         
-        // ==================== STATUS ONLINE ====================
         function atualizarStatusOnline(userId, status) {
             db.collection('usuarios').doc(userId).update({ online: status, ultimoAcesso: new Date() }).catch(()=>{});
         }
@@ -260,7 +246,6 @@
             return `visto em ${date.toLocaleDateString()}`;
         }
         
-        // ==================== BLOQUEIO ====================
         async function bloquearUsuario(userId) {
             if (confirm('Bloquear este usuário? Ele não poderá te enviar mensagens.')) {
                 await db.collection('usuarios').doc(usuarioAtual.id).update({
@@ -284,49 +269,18 @@
             return doc.data()?.bloqueados?.includes(userId) || false;
         }
         
-        // ==================== CONFIGURAÇÕES ====================
         function mostrarConfiguracoes() {
             const modal = document.getElementById('modalConfig');
             const content = document.getElementById('modalConfigContent');
             content.innerHTML = `
                 <h3>⚙️ CONFIGURAÇÕES</h3>
-                <div class="config-item">
-                    <label>🔔 Notificações</label>
-                    <div class="toggle ${notificacoesAtivas ? 'active' : ''}" onclick="toggleNotificacoes(this)">
-                        <div class="toggle-ball"></div>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <label>🔊 Som das mensagens</label>
-                    <div class="toggle ${somAtivo ? 'active' : ''}" onclick="toggleSom(this)">
-                        <div class="toggle-ball"></div>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <label>🌙 Tema escuro</label>
-                    <div class="toggle ${tema === 'escuro' ? 'active' : ''}" onclick="toggleTema(this)">
-                        <div class="toggle-ball"></div>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <label>🔤 Tamanho da fonte</label>
-                    <div>
-                        <span class="fonte-option ${tamanhoFonte === 'pequena' ? 'active' : ''}" onclick="mudarFonte('pequena')">P</span>
-                        <span class="fonte-option ${tamanhoFonte === 'normal' ? 'active' : ''}" onclick="mudarFonte('normal')">M</span>
-                        <span class="fonte-option ${tamanhoFonte === 'grande' ? 'active' : ''}" onclick="mudarFonte('grande')">G</span>
-                    </div>
-                </div>
-                <div class="config-item">
-                    <label>🔒 Usuários bloqueados</label>
-                    <button class="btn-secondary" onclick="mostrarBloqueados()">Ver lista</button>
-                </div>
-                <div class="config-item">
-                    <label>👤 Meu perfil</label>
-                    <button class="btn-secondary" onclick="mostrarEditarPerfil()">Editar perfil</button>
-                </div>
-                <div style="margin-top: 20px;">
-                    <button class="btn-secondary" onclick="fecharModalConfig()">Fechar</button>
-                </div>
+                <div class="config-item"><label>🔔 Notificações</label><div class="toggle ${notificacoesAtivas ? 'active' : ''}" onclick="toggleNotificacoes(this)"><div class="toggle-ball"></div></div></div>
+                <div class="config-item"><label>🔊 Som das mensagens</label><div class="toggle ${somAtivo ? 'active' : ''}" onclick="toggleSom(this)"><div class="toggle-ball"></div></div></div>
+                <div class="config-item"><label>🌙 Tema escuro</label><div class="toggle ${tema === 'escuro' ? 'active' : ''}" onclick="toggleTema(this)"><div class="toggle-ball"></div></div></div>
+                <div class="config-item"><label>🔤 Tamanho da fonte</label><div><span class="fonte-option ${tamanhoFonte === 'pequena' ? 'active' : ''}" onclick="mudarFonte('pequena')">P</span><span class="fonte-option ${tamanhoFonte === 'normal' ? 'active' : ''}" onclick="mudarFonte('normal')">M</span><span class="fonte-option ${tamanhoFonte === 'grande' ? 'active' : ''}" onclick="mudarFonte('grande')">G</span></div></div>
+                <div class="config-item"><label>🔒 Usuários bloqueados</label><button class="btn-secondary" onclick="mostrarBloqueados()">Ver lista</button></div>
+                <div class="config-item"><label>👤 Meu perfil</label><button class="btn-secondary" onclick="mostrarEditarPerfil()">Editar perfil</button></div>
+                <div style="margin-top: 20px;"><button class="btn-secondary" onclick="fecharModalConfig()">Fechar</button></div>
             `;
             modal.style.display = 'flex';
         }
@@ -334,40 +288,19 @@
         async function mostrarBloqueados() {
             const doc = await db.collection('usuarios').doc(usuarioAtual.id).get();
             const bloqueados = doc.data()?.bloqueados || [];
-            if (bloqueados.length === 0) {
-                alert('Nenhum usuário bloqueado');
-                return;
-            }
+            if (bloqueados.length === 0) { alert('Nenhum usuário bloqueado'); mostrarConfiguracoes(); return; }
             const users = [];
             for (const id of bloqueados) {
                 const u = await db.collection('usuarios').doc(id).get();
                 if (u.exists) users.push({ id, ...u.data() });
             }
-            const modal = document.getElementById('modalConfig');
             const content = document.getElementById('modalConfigContent');
-            content.innerHTML = `
-                <h3>🔒 Usuários bloqueados</h3>
-                ${users.map(u => `
-                    <div class="bloqueado-item">
-                        <div><strong>${u.nome}</strong><br><small>${u.profissao || ''}</small></div>
-                        <button class="btn-desbloquear" onclick="desbloquearUsuario('${u.id}')">Desbloquear</button>
-                    </div>
-                `).join('')}
-                <button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>
-            `;
+            content.innerHTML = `<h3>🔒 Usuários bloqueados</h3>${users.map(u => `<div class="bloqueado-item"><div><strong>${u.nome}</strong><br><small>${u.profissao || ''}</small></div><button class="btn-desbloquear" onclick="desbloquearUsuario('${u.id}')">Desbloquear</button></div>`).join('')}<button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>`;
         }
         
         function mostrarEditarPerfil() {
-            const modal = document.getElementById('modalConfig');
             const content = document.getElementById('modalConfigContent');
-            content.innerHTML = `
-                <h3>👤 Editar perfil</h3>
-                <input type="text" id="editNome" value="${escapeHtml(usuarioAtual.nome || '')}" placeholder="Nome">
-                <input type="text" id="editProfissao" value="${escapeHtml(usuarioAtual.profissao || '')}" placeholder="Profissão">
-                <textarea id="editBio" rows="3" placeholder="Bio">${escapeHtml(usuarioAtual.bio || '')}</textarea>
-                <button class="btn-primary" onclick="salvarPerfilConfig()">Salvar</button>
-                <button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>
-            `;
+            content.innerHTML = `<h3>👤 Editar perfil</h3><input type="text" id="editNome" value="${escapeHtml(usuarioAtual.nome || '')}" placeholder="Nome"><input type="text" id="editProfissao" value="${escapeHtml(usuarioAtual.profissao || '')}" placeholder="Profissão"><textarea id="editBio" rows="3" placeholder="Bio">${escapeHtml(usuarioAtual.bio || '')}</textarea><button class="btn-primary" onclick="salvarPerfilConfig()">Salvar</button><button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>`;
         }
         
         async function salvarPerfilConfig() {
@@ -390,31 +323,19 @@
         function fecharModalEditar() { document.getElementById('modalEditar').style.display = 'none'; }
         function fecharModalResponder() { document.getElementById('modalResponder').style.display = 'none'; respondendoMsg = null; }
         
-        // ==================== FUNÇÕES PRINCIPAIS ====================
         function renderizar() {
             const app = document.getElementById('app');
             if (!usuarioAtual) {
                 app.innerHTML = `
-                    <div class="app">
-                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div></div>
-                        <div style="flex:1; display: flex; align-items: center; justify-content: center;">
-                            <div class="form-card">
-                                <div class="tab-buttons"><button id="btnEntrar" class="tab-btn active">Entrar</button><button id="btnCadastrar" class="tab-btn">Cadastrar</button></div>
-                                <div id="telaEntrar"><div id="erroLogin" class="error"></div><input type="email" id="emailLogin" placeholder="E-mail"><input type="password" id="senhaLogin" placeholder="Senha"><button onclick="fazerLogin()">Entrar</button></div>
-                                <div id="telaCadastrar" style="display:none"><div id="erroCadastro" class="error"></div><div id="sucessoCadastro" class="success"></div><input type="text" id="nome" placeholder="Nome completo"><input type="email" id="email" placeholder="E-mail"><input type="text" id="idUnico" placeholder="Seu ID único"><input type="text" id="profissao" placeholder="Profissão"><textarea id="bio" rows="3" placeholder="Bio"></textarea><input type="password" id="senha" placeholder="Senha"><button onclick="fazerCadastro()">Criar conta</button></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    <div class="app"><div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div></div>
+                    <div style="flex:1; display: flex; align-items: center; justify-content: center;">
+                        <div class="form-card"><div class="tab-buttons"><button id="btnEntrar" class="tab-btn active">Entrar</button><button id="btnCadastrar" class="tab-btn">Cadastrar</button></div>
+                        <div id="telaEntrar"><div id="erroLogin" class="error"></div><input type="email" id="emailLogin" placeholder="E-mail"><input type="password" id="senhaLogin" placeholder="Senha"><button onclick="fazerLogin()">Entrar</button></div>
+                        <div id="telaCadastrar" style="display:none"><div id="erroCadastro" class="error"></div><div id="sucessoCadastro" class="success"></div><input type="text" id="nome" placeholder="Nome completo"><input type="email" id="email" placeholder="E-mail"><input type="text" id="idUnico" placeholder="Seu ID único"><input type="text" id="profissao" placeholder="Profissão"><textarea id="bio" rows="3" placeholder="Bio"></textarea><input type="password" id="senha" placeholder="Senha"><button onclick="fazerCadastro()">Criar conta</button></div></div></div></div>`;
                 document.getElementById('btnEntrar').onclick = () => { document.getElementById('telaEntrar').style.display='block'; document.getElementById('telaCadastrar').style.display='none'; document.getElementById('btnEntrar').classList.add('active'); document.getElementById('btnCadastrar').classList.remove('active'); };
                 document.getElementById('btnCadastrar').onclick = () => { document.getElementById('telaEntrar').style.display='none'; document.getElementById('telaCadastrar').style.display='block'; document.getElementById('btnCadastrar').classList.add('active'); document.getElementById('btnEntrar').classList.remove('active'); };
             } else {
-                app.innerHTML = `
-                    <div class="app">
-                        <div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="btn-icon" onclick="mostrarConfiguracoes()">⚙️</button><button class="btn-sair" style="background:rgba(255,255,255,0.15); border:none; color:white; padding:5px 12px; border-radius:20px; cursor:pointer;" onclick="fazerLogout()">Sair</button></div></div>
-                        <div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div>
-                    </div>
-                `;
+                app.innerHTML = `<div class="app"><div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="btn-icon" onclick="mostrarConfiguracoes()">⚙️</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div><div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div></div>`;
                 carregarListas();
                 iniciarStatusOnline();
             }
@@ -455,20 +376,10 @@
             modoSelecao = false;
             mensagensSelecionadas.clear();
             document.getElementById('app').innerHTML = `
-                <div class="app">
-                    <div class="chat-header">
-                        <button class="btn-icon" style="background:none;" onclick="voltar()">←</button>
-                        <div class="chat-header-info" onclick="verPerfilChat()">
-                            <div class="chat-avatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div>
-                            <div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div>
-                        </div>
-                        <div><button class="btn-icon" style="background:none;" onclick="abrirMenuChat()">⋮</button></div>
-                    </div>
-                    <div id="selectionBar" style="display:none;" class="selection-bar"></div>
-                    <div id="respostaPreview" style="display:none;" class="resposta-preview"></div>
-                    <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
-                    <div class="input-area"><textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea><button class="btn-enviar" onclick="enviarMsg()">➤</button></div>
-                </div>`;
+                <div class="app"><div class="chat-header"><button class="btn-icon" style="background:none;" onclick="voltar()">←</button><div class="chat-header-info" onclick="verPerfilChat()"><div class="chat-avatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div><div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div></div><div><button class="btn-icon" style="background:none;" onclick="abrirMenuChat()">⋮</button></div></div>
+                <div id="selectionBar" style="display:none;" class="selection-bar"></div><div id="respostaPreview" style="display:none;" class="resposta-preview"></div>
+                <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
+                <div class="input-area"><textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea><button class="btn-enviar" onclick="enviarMsg()">➤</button></div></div>`;
             document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
             carregarMensagens();
             db.collection('usuarios').doc(chatCom.id).onSnapshot(doc => {
@@ -495,8 +406,11 @@
             if (confirm('Apagar TODAS as mensagens desta conversa?')) {
                 const chatId = obterChatId(usuarioAtual.id, chatCom.id);
                 const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
-                msgs.forEach(d => d.ref.delete());
-                alert('Todas as mensagens foram apagadas!');
+                const promises = [];
+                msgs.forEach(d => promises.push(d.ref.delete()));
+                await Promise.all(promises);
+                const menu = document.getElementById('menuContexto');
+                menu.style.display = 'none';
             }
         }
         
@@ -508,11 +422,7 @@
             }
         }
         
-        function voltar() { 
-            if (unsubscribeMessages) unsubscribeMessages();
-            chatCom = null; 
-            renderizar(); 
-        }
+        function voltar() { if (unsubscribeMessages) unsubscribeMessages(); chatCom = null; renderizar(); }
         
         let ultimaMsgId = null;
         
@@ -539,10 +449,62 @@
                     const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
                     const selecionada = mensagensSelecionadas.has(m.id);
                     const respostaHtml = m.resposta ? `<div class="mensagem-resposta">↩️ ${escapeHtml(m.resposta.autor)}: ${escapeHtml(m.resposta.texto)}</div>` : '';
-                    return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"><div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
+                    return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" 
+                        onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
+                        oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
+                        ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
+                        ontouchend="cancelarPressionar()"
+                        ontouchmove="cancelarPressionar()">
+                        <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
                 }).join('');
                 container.scrollTop = container.scrollHeight;
             });
+        }
+        
+        function iniciarPressionar(event, id, texto, enviada) {
+            if (pressionarTimeout) clearTimeout(pressionarTimeout);
+            pressionarTimeout = setTimeout(() => {
+                if (!modoSelecao) {
+                    modoSelecao = true;
+                    selecionarMensagem(id);
+                    const menu = document.getElementById('menuContexto');
+                    menu.style.display = 'none';
+                }
+            }, 500);
+        }
+        
+        function cancelarPressionar() {
+            if (pressionarTimeout) { clearTimeout(pressionarTimeout); pressionarTimeout = null; }
+        }
+        
+        function abrirMenuMensagem(event, id, texto, enviada) {
+            event.stopPropagation();
+            cancelarPressionar();
+            if (modoSelecao) { selecionarMensagem(id); return; }
+            if (event.type === 'contextmenu') {
+                event.preventDefault();
+                if (!enviada) return;
+                mensagemSelecionada = { id, texto };
+                const menu = document.getElementById('menuContexto');
+                menu.innerHTML = `<button onclick="editarMsg()">✏️ Editar</button><button onclick="apagarMsg()">🗑️ Apagar</button><button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button><button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>`;
+                let x = event.clientX, y = event.clientY;
+                menu.style.display = 'block';
+                menu.style.left = (x - 80) + 'px';
+                menu.style.top = (y - 40) + 'px';
+                setTimeout(() => { document.addEventListener('click', () => menu.style.display='none', { once: true }); }, 100);
+                return;
+            }
+            if (enviada) {
+                mensagemSelecionada = { id, texto };
+                const menu = document.getElementById('menuContexto');
+                menu.innerHTML = `<button onclick="editarMsg()">✏️ Editar</button><button onclick="apagarMsg()">🗑️ Apagar</button><button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button><button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>`;
+                let x = event.touches ? event.touches[0].clientX : event.clientX;
+                let y = event.touches ? event.touches[0].clientY : event.clientY;
+                menu.style.display = 'block';
+                menu.style.left = (x - 80) + 'px';
+                menu.style.top = (y - 40) + 'px';
+                setTimeout(() => { document.addEventListener('click', () => menu.style.display='none', { once: true }); }, 100);
+            }
         }
         
         function selecionarMensagem(id) {
@@ -554,14 +516,10 @@
         
         function atualizarBarraSelecao() {
             const barra = document.getElementById('selectionBar');
-            const preview = document.getElementById('respostaPreview');
             if (mensagensSelecionadas.size > 0) {
                 barra.style.display = 'flex';
                 barra.innerHTML = `<span>${mensagensSelecionadas.size} mensagem(ns) selecionada(s)</span><div><button onclick="apagarSelecionadas()">🗑️ Apagar</button><button onclick="cancelarSelecao()">✖️ Cancelar</button></div>`;
-            } else {
-                barra.style.display = 'none';
-                modoSelecao = false;
-            }
+            } else { barra.style.display = 'none'; modoSelecao = false; }
         }
         
         function cancelarSelecao() { modoSelecao = false; mensagensSelecionadas.clear(); atualizarBarraSelecao(); carregarMensagens(); }
@@ -569,36 +527,11 @@
         async function apagarSelecionadas() {
             if (confirm(`Apagar ${mensagensSelecionadas.size} mensagens?`)) {
                 const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-                for (const id of mensagensSelecionadas) {
-                    await db.collection('chats').doc(chatId).collection('mensagens').doc(id).delete();
-                }
-                mensagensSelecionadas.clear();
-                modoSelecao = false;
-                atualizarBarraSelecao();
-                carregarMensagens();
+                const promises = [];
+                for (const id of mensagensSelecionadas) promises.push(db.collection('chats').doc(chatId).collection('mensagens').doc(id).delete());
+                await Promise.all(promises);
+                mensagensSelecionadas.clear(); modoSelecao = false; atualizarBarraSelecao();
             }
-        }
-        
-        function abrirMenuMensagem(event, id, texto, enviada) {
-            event.stopPropagation();
-            if (!enviada && !modoSelecao) return;
-            const menu = document.getElementById('menuContexto');
-            if (modoSelecao) {
-                selecionarMensagem(id);
-                return;
-            }
-            mensagemSelecionada = { id, texto };
-            let html = '';
-            if (enviada) html += `<button onclick="editarMsg()">✏️ Editar</button><button onclick="apagarMsg()">🗑️ Apagar</button>`;
-            html += `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>`;
-            if (!modoSelecao) html += `<button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>`;
-            menu.innerHTML = html;
-            let x = event.touches ? event.touches[0].clientX : event.clientX;
-            let y = event.touches ? event.touches[0].clientY : event.clientY;
-            menu.style.display = 'block';
-            menu.style.left = (x - 80) + 'px';
-            menu.style.top = (y - 40) + 'px';
-            setTimeout(() => { document.addEventListener('click', () => menu.style.display='none', { once: true }); }, 100);
         }
         
         function iniciarModoSelecao() { modoSelecao = true; document.getElementById('menuContexto').style.display = 'none'; }
@@ -616,11 +549,8 @@
             if (!resposta) return;
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
             await db.collection('chats').doc(chatId).collection('mensagens').add({
-                texto: resposta,
-                remetenteId: usuarioAtual.id,
-                destinatarioId: chatCom.id,
-                timestamp: new Date(),
-                editado: false,
+                texto: resposta, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id,
+                timestamp: new Date(), editado: false,
                 resposta: { autor: usuarioAtual.nome, texto: respondendoMsg.texto, msgId: respondendoMsg.id }
             });
             fecharModalResponder();
@@ -641,9 +571,7 @@
                 const r = await auth.signInWithEmailAndPassword(email, senha);
                 const d = await db.collection('usuarios').doc(r.user.uid).get();
                 usuarioAtual = { id: r.user.uid, nome: d.data()?.nome || email.split('@')[0], email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
-                aplicarTema();
-                renderizar();
-                solicitarPermissaoNotificacao();
+                aplicarTema(); renderizar(); solicitarPermissaoNotificacao();
             } catch(e) { err.style.display='block'; err.innerText=e.message; }
         }
         
@@ -663,20 +591,13 @@
             } catch(e) { err.style.display='block'; err.innerText=e.message; }
         }
         
-        async function fazerLogout() { 
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false });
-            await auth.signOut(); 
-            usuarioAtual = null; 
-            renderizar(); 
-        }
+        async function fazerLogout() { if (unsubscribeMessages) unsubscribeMessages(); if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false }); await auth.signOut(); usuarioAtual = null; renderizar(); }
         
         auth.onAuthStateChanged(async user => {
             if (user) {
                 const d = await db.collection('usuarios').doc(user.uid).get();
                 usuarioAtual = { id: user.uid, nome: d.data()?.nome || user.email.split('@')[0], email: user.email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
-                aplicarTema();
-                renderizar();
+                aplicarTema(); renderizar();
             } else renderizar();
         });
     </script>
