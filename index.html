@@ -496,15 +496,14 @@
         
         async function apagarTudo() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const msgs = await db.collection('chats').doc(chatId).collection('mensagens')
-                .where('remetenteId', '==', usuarioAtual.id).get();
+            const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
             
             if (msgs.empty) {
-                alert('Você não tem mensagens para apagar.');
+                alert('Nenhuma mensagem para apagar.');
                 return;
             }
             
-            if (confirm(`Apagar todas as suas mensagens desta conversa?`)) {
+            if (confirm(`Apagar TODAS as mensagens desta conversa? (${msgs.size} mensagens)`)) {
                 const promises = [];
                 msgs.forEach(d => promises.push(d.ref.delete()));
                 await Promise.all(promises);
@@ -513,7 +512,35 @@
                 atualizarBarraSelecao();
                 const menu = document.getElementById('menuContexto');
                 menu.style.display = 'none';
-                alert('Suas mensagens foram apagadas!');
+                alert('Todas as mensagens foram apagadas!');
+            }
+        }
+        
+        async function apagarSelecionadas() {
+            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+            const mensagensParaApagar = [];
+            
+            for (const id of mensagensSelecionadas) {
+                const doc = await db.collection('chats').doc(chatId).collection('mensagens').doc(id).get();
+                if (doc.exists && doc.data().remetenteId === usuarioAtual.id) {
+                    mensagensParaApagar.push(id);
+                }
+            }
+            
+            if (mensagensParaApagar.length === 0) {
+                alert('Você só pode apagar suas próprias mensagens. Nenhuma das selecionadas é sua.');
+                return;
+            }
+            
+            if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s)?`)) {
+                const promises = [];
+                for (const id of mensagensParaApagar) {
+                    promises.push(db.collection('chats').doc(chatId).collection('mensagens').doc(id).delete());
+                }
+                await Promise.all(promises);
+                mensagensSelecionadas.clear();
+                modoSelecao = false;
+                atualizarBarraSelecao();
             }
         }
         
@@ -648,7 +675,14 @@
                 mensagensSelecionadas.add(id);
             }
             atualizarBarraSelecao();
-            carregarMensagens();
+            const mensagemDiv = document.querySelector(`.mensagem[data-id="${id}"]`);
+            if (mensagemDiv) {
+                if (mensagensSelecionadas.has(id)) {
+                    mensagemDiv.classList.add('mensagem-selecionada');
+                } else {
+                    mensagemDiv.classList.remove('mensagem-selecionada');
+                }
+            }
         }
         
         function atualizarBarraSelecao() {
@@ -673,41 +707,14 @@
             modoSelecao = false; 
             mensagensSelecionadas.clear(); 
             atualizarBarraSelecao(); 
-            carregarMensagens();
-        }
-        
-        async function apagarSelecionadas() {
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const mensagensParaApagar = [];
-            
-            for (const id of mensagensSelecionadas) {
-                const doc = await db.collection('chats').doc(chatId).collection('mensagens').doc(id).get();
-                if (doc.exists && doc.data().remetenteId === usuarioAtual.id) {
-                    mensagensParaApagar.push(id);
-                }
-            }
-            
-            if (mensagensParaApagar.length === 0) {
-                alert('Você só pode apagar suas próprias mensagens.');
-                return;
-            }
-            
-            if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s)?`)) {
-                const promises = [];
-                for (const id of mensagensParaApagar) {
-                    promises.push(db.collection('chats').doc(chatId).collection('mensagens').doc(id).delete());
-                }
-                await Promise.all(promises);
-                mensagensSelecionadas.clear();
-                modoSelecao = false;
-                atualizarBarraSelecao();
-            }
+            document.querySelectorAll('.mensagem-selecionada').forEach(el => {
+                el.classList.remove('mensagem-selecionada');
+            });
         }
         
         function iniciarModoSelecao() { 
             modoSelecao = true; 
             document.getElementById('menuContexto').style.display = 'none';
-            mensagensSelecionadas.clear();
             atualizarBarraSelecao();
             carregarMensagens();
         }
