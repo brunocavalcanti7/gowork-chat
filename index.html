@@ -24,6 +24,7 @@
             --header-bg: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%);
             --online: #22c55e;
             --offline: #94a3b8;
+            --visto: #60a5fa;
         }
         
         body.dark {
@@ -33,6 +34,7 @@
             --text-secondary: #94a3b8;
             --border: #334155;
             --accent-dark: #2563eb;
+            --visto: #60a5fa;
         }
         
         body { background: linear-gradient(135deg, #0a2b3e 0%, #1a4a6f 100%); font-family: 'Inter', sans-serif; }
@@ -75,8 +77,11 @@
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
         .mensagem-texto a { color: inherit; text-decoration: underline; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
-        .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; }
+        .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
+        .visto-icon { font-size: 10px; margin-left: 4px; }
+        .visto-lido { color: var(--visto); }
+        .visto-enviado { color: rgba(255,255,255,0.6); }
         
         .mensagem-selecionada .mensagem-bolha {
             background: var(--accent-dark) !important;
@@ -572,6 +577,10 @@
                     <button class="btn-enviar" onclick="enviarMsg()">➤</button>
                 </div>`;
             document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
+            
+            // Marcar mensagens como lidas ao abrir o chat
+            marcarMensagensComoLidas();
+            
             carregarMensagens();
             db.collection('usuarios').doc(chatCom.id).onSnapshot(doc => {
                 if (!doc.exists) return;
@@ -581,6 +590,20 @@
                 if (status) status.innerText = online ? '🟢 Online' : `⚫ ${formatarUltimoAcesso(doc.data().ultimoAcesso)}`;
                 if (dot) dot.className = online ? 'status-online' : 'status-offline';
             });
+        }
+        
+        async function marcarMensagensComoLidas() {
+            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+            const msgsNaoLidas = await db.collection('chats').doc(chatId).collection('mensagens')
+                .where('remetenteId', '!=', usuarioAtual.id)
+                .where('lido', '==', false)
+                .get();
+            
+            const promises = [];
+            msgsNaoLidas.forEach(doc => {
+                promises.push(doc.ref.update({ lido: true, lidoEm: new Date() }));
+            });
+            await Promise.all(promises);
         }
         
         function abrirMenuChat() {
@@ -678,6 +701,7 @@
                         return !(m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id));
                     });
                     
+                    // ORDENAÇÃO ABSOLUTA POR TIMESTAMP
                     msgsVisiveis.sort((a, b) => {
                         const timeA = a.timestamp ? a.timestamp.toDate().getTime() : 0;
                         const timeB = b.timestamp ? b.timestamp.toDate().getTime() : 0;
@@ -717,13 +741,23 @@
                             conteudo = `<a href="${mapaLink}" target="_blank" style="color: inherit; text-decoration: underline;">📍 Ver localização no mapa</a>`;
                         }
                         
+                        // Icone de visto
+                        let vistoIcon = '';
+                        if (enviada) {
+                            if (m.lido) {
+                                vistoIcon = '<span class="visto-icon visto-lido">✓✓</span>';
+                            } else {
+                                vistoIcon = '<span class="visto-icon visto-enviado">✓</span>';
+                            }
+                        }
+                        
                         html += `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}" data-timestamp="${m.timestamp?.toDate().getTime() || 0}"
                             onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
                             oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
                             ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
                             ontouchend="cancelarPressionar()"
                             ontouchmove="cancelarPressionar()">
-                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
+                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}${vistoIcon}</div></div></div>`;
                     }
                     
                     container.innerHTML = html;
@@ -828,7 +862,7 @@
         async function apagarMsg() { document.getElementById('menuContexto').style.display = 'none'; if (confirm('Apagar esta mensagem apenas para você?')) { const chatId = obterChatId(usuarioAtual.id, chatCom.id); const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id); const doc = await msgRef.get(); if (doc.exists) { const apagadoPor = doc.data().apagadoPor || []; if (!apagadoPor.includes(usuarioAtual.id)) { apagadoPor.push(usuarioAtual.id); await msgRef.update({ apagadoPor: apagadoPor }); } } } }
         async function salvarEdicao() { const novo = document.getElementById('editarTexto').value.trim(); if (!novo) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ texto: novo, editado: true }); fecharModalEditar(); }
         function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false }); input.value = ''; fecharEmojiPicker(); }
+        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false, lido: false }); input.value = ''; fecharEmojiPicker(); }
         function obterChatId(a,b) { return a < b ? `${a}_${b}` : `${b}_${a}`; }
         
         async function fazerLogin() {
