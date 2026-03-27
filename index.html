@@ -80,7 +80,13 @@
         .btn-perfil { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-right: 8px; }
         .btn-notif { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; margin-right: 8px; }
         @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
-    </style>
+    </style><script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('✅ Service Worker registrado com sucesso!'))
+            .catch(err => console.log('❌ Erro ao registrar:', err));
+    }
+</script>
 </head>
 <body>
     <div id="app"></div>
@@ -557,6 +563,12 @@
                 renderizar();
             } else renderizar();
         });
-    </script>
+    </script><script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+            .then(reg => console.log('✅ Service Worker registrado'))
+            .catch(err => console.log('❌ Erro:', err));
+    }
+</script>
 </body>
 </html>
