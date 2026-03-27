@@ -19,7 +19,7 @@
             --text-secondary: #64748b;
             --border: #e2e8f0;
             --accent: #3b82f6;
-            --accent-dark: #2563eb;
+            --accent-dark: #1e4a8c;
             --accent-light: #60a5fa;
             --header-bg: linear-gradient(135deg, #0f2b3d 0%, #1e3a5f 100%);
             --online: #22c55e;
@@ -32,6 +32,7 @@
             --text-primary: #f1f5f9;
             --text-secondary: #94a3b8;
             --border: #334155;
+            --accent-dark: #2563eb;
         }
         
         body { background: linear-gradient(135deg, #0a2b3e 0%, #1a4a6f 100%); font-family: 'Inter', sans-serif; }
@@ -88,15 +89,36 @@
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
+        
+        /* Mensagem selecionada com destaque escuro e check */
         .mensagem-selecionada .mensagem-bolha {
-            background: var(--accent) !important;
+            background: var(--accent-dark) !important;
             color: white !important;
             transform: scale(0.98);
-            box-shadow: 0 0 0 2px var(--accent-light), 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 0 0 3px var(--accent-light), 0 4px 12px rgba(0,0,0,0.2);
             transition: all 0.2s ease;
+            filter: brightness(0.95);
         }
-        .mensagem-selecionada { animation: selecionarPulse 0.2s ease; }
-        @keyframes selecionarPulse { 0% { transform: scale(1); } 50% { transform: scale(0.98); } 100% { transform: scale(1); } }
+        
+        .mensagem-selecionada {
+            animation: selecionarPulse 0.2s ease;
+        }
+        
+        .mensagem-selecionada .mensagem-bolha::after {
+            content: "✓";
+            position: absolute;
+            right: 8px;
+            bottom: 8px;
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: bold;
+        }
+        
+        @keyframes selecionarPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.97); }
+            100% { transform: scale(1); }
+        }
         
         .selection-bar { background: var(--accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: white; animation: slideDown 0.2s ease; }
         .selection-bar button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-left: 8px; transition: all 0.2s; }
@@ -618,7 +640,6 @@
                 return; 
             }
             
-            // Se não for mensagem própria, só mostra responder
             if (!enviada) {
                 mensagemSelecionada = { id, texto };
                 const menu = document.getElementById('menuContexto');
@@ -640,7 +661,6 @@
                 return;
             }
             
-            // Mensagem própria: menu completo
             mensagemSelecionada = { id, texto };
             const menu = document.getElementById('menuContexto');
             menu.innerHTML = `
