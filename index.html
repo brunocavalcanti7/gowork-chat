@@ -73,16 +73,9 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
-        @keyframes mensagemDesaparecer {
-            to { opacity: 0; transform: translateX(-10px); }
-        }
-        
-        .mensagem-apagando { animation: mensagemDesaparecer 0.2s ease forwards; }
-        
         .mensagem.enviada { justify-content: flex-end; }
         .mensagem.recebida { justify-content: flex-start; }
         .mensagem-bolha { max-width: 75%; padding: 8px 14px; border-radius: 18px; word-wrap: break-word; transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1); position: relative; }
-        .mensagem-bolha:active { transform: scale(0.97); opacity: 0.9; }
         .mensagem.enviada .mensagem-bolha { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
         .mensagem.recebida .mensagem-bolha { background: var(--bg-secondary); color: var(--text-primary); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
@@ -95,14 +88,7 @@
             color: white !important;
             transform: scale(0.98);
             box-shadow: 0 0 0 3px var(--accent-light), 0 4px 12px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-            filter: brightness(0.95);
         }
-        
-        .mensagem-selecionada {
-            animation: selecionarPulse 0.2s ease;
-        }
-        
         .mensagem-selecionada .mensagem-bolha::after {
             content: "✓";
             position: absolute;
@@ -111,12 +97,6 @@
             font-size: 12px;
             opacity: 0.9;
             font-weight: bold;
-        }
-        
-        @keyframes selecionarPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.97); }
-            100% { transform: scale(1); }
         }
         
         .selection-bar { background: var(--accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: white; animation: slideDown 0.2s ease; }
@@ -128,59 +108,37 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-        .toque-feedback {
-            position: fixed;
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0.6;
-            pointer-events: none;
-            transform: scale(0);
-            animation: toqueAnimacao 0.3s ease-out forwards;
-            z-index: 10000;
-        }
-        
-        @keyframes toqueAnimacao {
-            0% { transform: scale(0); opacity: 0.8; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        
-        .input-area { padding: 12px 15px; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-end; }
-        .input-mensagem { flex: 1; padding: 10px 15px; border: 1px solid var(--border); border-radius: 24px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg-primary); color: var(--text-primary); transition: all 0.2s; }
+        .input-area { padding: 12px 15px; background: var(--bg-secondary); border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .input-wrapper { flex: 1; display: flex; gap: 8px; align-items: flex-end; }
+        .input-mensagem { flex: 1; padding: 10px 15px; border: 1px solid var(--border); border-radius: 24px; resize: none; font-family: 'Inter', sans-serif; font-size: 14px; background: var(--bg-primary); color: var(--text-primary); max-height: 100px; }
         .input-mensagem:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .btn-enviar { background: var(--accent); border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-enviar:active { transform: scale(0.95); }
+        .btn-input { background: var(--bg-primary); border: 1px solid var(--border); color: var(--text-primary); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-input:active { transform: scale(0.95); }
+        .btn-enviar { background: var(--accent); border: none; color: white; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .resposta-preview { background: var(--bg-primary); padding: 8px 15px; border-left: 3px solid var(--accent); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
         
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; backdrop-filter: blur(4px); animation: fadeIn 0.2s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-content { background: var(--bg-secondary); border-radius: 24px; padding: 24px; width: 90%; max-width: 350px; color: var(--text-primary); animation: scaleIn 0.2s ease; }
-        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .emoji-picker { position: fixed; bottom: 80px; left: 20px; right: 20px; background: var(--bg-secondary); border-radius: 20px; padding: 15px; display: none; flex-wrap: wrap; gap: 10px; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.2); border: 1px solid var(--border); max-height: 200px; overflow-y: auto; }
+        .emoji { font-size: 28px; cursor: pointer; padding: 5px; transition: transform 0.1s; }
+        .emoji:active { transform: scale(1.2); }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; backdrop-filter: blur(4px); }
+        .modal-content { background: var(--bg-secondary); border-radius: 24px; padding: 24px; width: 90%; max-width: 350px; color: var(--text-primary); }
         .modal-content h3 { margin-bottom: 20px; }
         .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); }
-        .modal-content button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
-        .modal-content button:active { transform: scale(0.98); }
+        .modal-content button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-secondary { background: var(--border); color: var(--text-primary); }
-        .menu-contexto { position: fixed; background: var(--bg-secondary); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; display: none; overflow: hidden; border: 1px solid var(--border); animation: scaleIn 0.1s ease; }
-        .menu-contexto button { display: block; width: 100%; padding: 12px 20px; background: var(--bg-secondary); border: none; text-align: left; cursor: pointer; font-size: 14px; color: var(--text-primary); transition: background 0.2s; }
-        .menu-contexto button:active { background: var(--bg-primary); }
+        .menu-contexto { position: fixed; background: var(--bg-secondary); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; display: none; overflow: hidden; border: 1px solid var(--border); }
+        .menu-contexto button { display: block; width: 100%; padding: 12px 20px; background: var(--bg-secondary); border: none; text-align: left; cursor: pointer; font-size: 14px; color: var(--text-primary); }
         .loading { text-align: center; padding: 30px; color: var(--text-secondary); font-size: 13px; }
         .form-card { background: var(--bg-secondary); border-radius: 24px; padding: 28px 24px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        .form-card h2 { text-align: center; color: var(--accent); margin-bottom: 24px; font-size: 22px; }
-        .form-card input { width: 100%; padding: 14px 16px; margin: 10px 0; border: 1px solid var(--border); border-radius: 16px; font-size: 15px; background: var(--bg-primary); color: var(--text-primary); transition: all 0.2s; }
-        .form-card input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-        .form-card button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 16px; transition: all 0.2s; }
-        .form-card button:active { transform: scale(0.98); }
         .tab-buttons { display: flex; gap: 12px; margin-bottom: 24px; background: var(--bg-primary); padding: 4px; border-radius: 20px; }
-        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--text-secondary); transition: all 0.2s; }
-        .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; border-radius: 16px; font-size: 15px; font-weight: 600; cursor: pointer; color: var(--text-secondary); }
+        .tab-btn.active { background: var(--accent); color: white; }
         .error { color: #ef4444; font-size: 12px; margin-top: 5px; display: none; text-align: center; }
         .success { color: #10b981; font-size: 12px; margin-top: 5px; display: none; text-align: center; }
         .input-group { margin-bottom: 16px; }
         .input-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-        .helper-text { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
         .id-display { background: var(--bg-primary); padding: 12px; border-radius: 12px; font-family: monospace; font-size: 14px; text-align: center; margin: 8px 0; color: var(--accent); font-weight: bold; }
         
         .config-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
@@ -188,12 +146,10 @@
         .toggle.active { background: var(--accent); }
         .toggle-ball { width: 22px; height: 22px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; }
         .toggle.active .toggle-ball { left: 26px; }
-        .fonte-option { display: inline-block; padding: 6px 12px; margin: 4px; background: var(--bg-primary); border-radius: 20px; cursor: pointer; transition: all 0.2s; }
-        .fonte-option:active { transform: scale(0.95); }
+        .fonte-option { display: inline-block; padding: 6px 12px; margin: 4px; background: var(--bg-primary); border-radius: 20px; cursor: pointer; }
         .fonte-option.active { background: var(--accent); color: white; }
         .bloqueado-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-primary); border-radius: 12px; margin-bottom: 8px; }
-        .btn-desbloquear { background: var(--accent); color: white; border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
-        .btn-desbloquear:active { transform: scale(0.95); }
+        .btn-desbloquear { background: var(--accent); color: white; border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; font-size: 12px; }
         
         body.fonte-pequena { font-size: 12px; }
         body.fonte-normal { font-size: 14px; }
@@ -203,6 +159,7 @@
 </head>
 <body>
     <div id="app"></div>
+    <div id="emojiPicker" class="emoji-picker"></div>
     <div id="menuContexto" class="menu-contexto"></div>
     <div id="modalConfig" class="modal"><div class="modal-content" id="modalConfigContent"></div></div>
     <div id="modalEditar" class="modal">
@@ -261,6 +218,8 @@
         let tema = localStorage.getItem('tema') || 'claro';
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
         
+        const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'];
+        
         function aplicarTema() {
             if (tema === 'escuro') document.body.classList.add('dark');
             else document.body.classList.remove('dark');
@@ -271,10 +230,50 @@
         function gerarIdAleatorio() {
             const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
             let id = '';
-            for (let i = 0; i < 8; i++) {
-                id += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
+            for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
             return `prestador_${id}`;
+        }
+        
+        function mostrarEmojis() {
+            const picker = document.getElementById('emojiPicker');
+            if (picker.style.display === 'flex') {
+                picker.style.display = 'none';
+                return;
+            }
+            picker.innerHTML = emojis.map(e => `<span class="emoji" onclick="inserirEmoji('${e}')">${e}</span>`).join('');
+            picker.style.display = 'flex';
+        }
+        
+        function inserirEmoji(emoji) {
+            const input = document.getElementById('msgInput');
+            if (input) {
+                input.value += emoji;
+                input.focus();
+            }
+            document.getElementById('emojiPicker').style.display = 'none';
+        }
+        
+        function compartilharLocalizacao() {
+            if (!navigator.geolocation) {
+                alert('Seu navegador não suporta geolocalização.');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const mapaUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                const texto = `📍 Localização: ${mapaUrl}`;
+                const chatId = obterChatId(usuarioAtual.id, chatCom.id);
+                await db.collection('chats').doc(chatId).collection('mensagens').add({
+                    texto: texto,
+                    remetenteId: usuarioAtual.id,
+                    destinatarioId: chatCom.id,
+                    timestamp: new Date(),
+                    editado: false
+                });
+            }, () => {
+                alert('Não foi possível obter sua localização.');
+            });
         }
         
         function mostrarFeedbackToque(event) {
@@ -492,7 +491,15 @@
                 <div id="selectionBar" style="display:none;" class="selection-bar"></div>
                 <div id="respostaPreview" style="display:none;" class="resposta-preview"></div>
                 <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
-                <div class="input-area"><textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea><button class="btn-enviar" onclick="enviarMsg()">➤</button></div></div>`;
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <button class="btn-input" onclick="mostrarEmojis()">😀</button>
+                        <button class="btn-input" onclick="compartilharLocalizacao()">📍</button>
+                        <textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea>
+                    </div>
+                    <button class="btn-enviar" onclick="enviarMsg()">➤</button>
+                </div>
+                <div id="emojiPicker" class="emoji-picker"></div>`;
             document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
             carregarMensagens();
             db.collection('usuarios').doc(chatCom.id).onSnapshot(doc => {
@@ -518,12 +525,7 @@
         async function apagarTudo() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
             const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
-            
-            if (msgs.empty) {
-                alert('Nenhuma mensagem para apagar.');
-                return;
-            }
-            
+            if (msgs.empty) { alert('Nenhuma mensagem para apagar.'); return; }
             if (confirm(`Apagar TODAS as mensagens desta conversa apenas para você? (${msgs.size} mensagens)`)) {
                 for (const doc of msgs.docs) {
                     const data = doc.data();
@@ -536,8 +538,7 @@
                 mensagensSelecionadas.clear();
                 modoSelecao = false;
                 atualizarBarraSelecao();
-                const menu = document.getElementById('menuContexto');
-                menu.style.display = 'none';
+                document.getElementById('menuContexto').style.display = 'none';
                 alert('Todas as mensagens foram apagadas apenas para você!');
             }
         }
@@ -545,26 +546,17 @@
         async function apagarSelecionadas() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
             const mensagensParaApagar = [];
-            
             for (const id of mensagensSelecionadas) {
                 const doc = await db.collection('chats').doc(chatId).collection('mensagens').doc(id).get();
-                if (doc.exists && doc.data().remetenteId === usuarioAtual.id) {
-                    mensagensParaApagar.push(id);
-                }
+                if (doc.exists && doc.data().remetenteId === usuarioAtual.id) mensagensParaApagar.push(id);
             }
-            
-            if (mensagensParaApagar.length === 0) {
-                alert('Você só pode apagar suas próprias mensagens. Nenhuma das selecionadas é sua.');
-                return;
-            }
-            
+            if (mensagensParaApagar.length === 0) { alert('Você só pode apagar suas próprias mensagens.'); return; }
             if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s) apenas para você?`)) {
                 for (const id of mensagensParaApagar) {
                     const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(id);
                     const doc = await msgRef.get();
                     if (doc.exists) {
-                        const data = doc.data();
-                        const apagadoPor = data.apagadoPor || [];
+                        const apagadoPor = doc.data().apagadoPor || [];
                         if (!apagadoPor.includes(usuarioAtual.id)) {
                             apagadoPor.push(usuarioAtual.id);
                             await msgRef.update({ apagadoPor: apagadoPor });
@@ -592,50 +584,43 @@
         function carregarMensagens() {
             const chatId = obterChatId(usuarioAtual.id, chatCom.id);
             if (unsubscribeMessages) unsubscribeMessages();
-            unsubscribeMessages = db.collection('chats').doc(chatId).collection('mensagens').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
-                const container = document.getElementById('mensagensArea');
-                if (!container) return;
-                const msgs = [];
-                snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
-                if (msgs.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
-                msgs.sort((a,b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
-                
-                const msgsVisiveis = msgs.filter(m => {
-                    if (m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id)) {
-                        return false;
+            unsubscribeMessages = db.collection('chats').doc(chatId).collection('mensagens')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => {
+                    const container = document.getElementById('mensagensArea');
+                    if (!container) return;
+                    const msgs = [];
+                    snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+                    
+                    const msgsVisiveis = msgs.filter(m => !(m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id)));
+                    msgsVisiveis.sort((a, b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
+                    
+                    const ultima = msgsVisiveis[msgsVisiveis.length - 1];
+                    if (ultima && ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
+                        mostrarNotificacaoLocal(`💼 ${chatCom.nome}`, ultima.texto);
+                        tocarSom();
+                        ultimaMsgId = ultima.id;
                     }
-                    return true;
+                    
+                    if (msgsVisiveis.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
+                    
+                    container.innerHTML = msgsVisiveis.map(m => {
+                        const enviada = m.remetenteId === usuarioAtual.id;
+                        let hora = '';
+                        if (m.timestamp) hora = m.timestamp.toDate().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+                        const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
+                        const selecionada = mensagensSelecionadas.has(m.id);
+                        const respostaHtml = m.resposta ? `<div class="mensagem-resposta">↩️ ${escapeHtml(m.resposta.autor)}: ${escapeHtml(m.resposta.texto)}</div>` : '';
+                        return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}"
+                            onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
+                            oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
+                            ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
+                            ontouchend="cancelarPressionar()"
+                            ontouchmove="cancelarPressionar()">
+                            <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
+                    }).join('');
+                    container.scrollTop = container.scrollHeight;
                 });
-                
-                const ultima = msgsVisiveis[msgsVisiveis.length - 1];
-                if (ultima && ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
-                    mostrarNotificacaoLocal(`💼 ${chatCom.nome}`, ultima.texto);
-                    tocarSom();
-                    ultimaMsgId = ultima.id;
-                }
-                
-                if (msgsVisiveis.length === 0) { 
-                    container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; 
-                    return; 
-                }
-                
-                container.innerHTML = msgsVisiveis.map(m => {
-                    const enviada = m.remetenteId === usuarioAtual.id;
-                    let hora = '';
-                    if (m.timestamp) hora = m.timestamp.toDate().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
-                    const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
-                    const selecionada = mensagensSelecionadas.has(m.id);
-                    const respostaHtml = m.resposta ? `<div class="mensagem-resposta">↩️ ${escapeHtml(m.resposta.autor)}: ${escapeHtml(m.resposta.texto)}</div>` : '';
-                    return `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}"
-                        onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" 
-                        oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;"
-                        ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})"
-                        ontouchend="cancelarPressionar()"
-                        ontouchmove="cancelarPressionar()">
-                        <div class="mensagem-bolha">${respostaHtml}<div class="mensagem-texto">${escapeHtml(m.texto)}${editado}</div><div class="mensagem-hora">${hora}</div></div></div>`;
-                }).join('');
-                container.scrollTop = container.scrollHeight;
-            });
         }
         
         function iniciarPressionar(event, id, texto, enviada) {
@@ -645,190 +630,64 @@
                     mostrarFeedbackToque(event);
                     modoSelecao = true;
                     selecionarMensagem(id);
-                    const menu = document.getElementById('menuContexto');
-                    menu.style.display = 'none';
+                    document.getElementById('menuContexto').style.display = 'none';
                 }
             }, 300);
         }
         
-        function cancelarPressionar() {
-            if (pressionarTimeout) { clearTimeout(pressionarTimeout); pressionarTimeout = null; }
-        }
+        function cancelarPressionar() { if (pressionarTimeout) { clearTimeout(pressionarTimeout); pressionarTimeout = null; } }
         
         function abrirMenuMensagem(event, id, texto, enviada) {
             event.stopPropagation();
             cancelarPressionar();
             mostrarFeedbackToque(event);
-            
-            if (modoSelecao) { 
-                selecionarMensagem(id); 
-                return; 
-            }
-            
+            if (modoSelecao) { selecionarMensagem(id); return; }
             if (!enviada) {
                 mensagemSelecionada = { id, texto };
                 const menu = document.getElementById('menuContexto');
                 menu.innerHTML = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>`;
-                let x, y;
-                if (event.touches) {
-                    x = event.touches[0].clientX;
-                    y = event.touches[0].clientY;
-                } else {
-                    x = event.clientX;
-                    y = event.clientY;
-                }
+                let x = event.touches ? event.touches[0].clientX : event.clientX;
+                let y = event.touches ? event.touches[0].clientY : event.clientY;
                 menu.style.display = 'block';
                 menu.style.left = (x - 80) + 'px';
                 menu.style.top = (y - 40) + 'px';
-                setTimeout(() => {
-                    document.addEventListener('click', () => menu.style.display = 'none', { once: true });
-                }, 100);
+                setTimeout(() => { document.addEventListener('click', () => menu.style.display = 'none', { once: true }); }, 100);
                 return;
             }
-            
             mensagemSelecionada = { id, texto };
             const menu = document.getElementById('menuContexto');
-            menu.innerHTML = `
-                <button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>
+            menu.innerHTML = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button>
                 <button onclick="editarMsg()">✏️ Editar</button>
                 <button onclick="apagarMsg()">🗑️ Apagar</button>
-                <button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>
-            `;
-            
-            let x, y;
-            if (event.touches) {
-                x = event.touches[0].clientX;
-                y = event.touches[0].clientY;
-            } else {
-                x = event.clientX;
-                y = event.clientY;
-            }
-            
+                <button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>`;
+            let x = event.touches ? event.touches[0].clientX : event.clientX;
+            let y = event.touches ? event.touches[0].clientY : event.clientY;
             menu.style.display = 'block';
             menu.style.left = (x - 80) + 'px';
             menu.style.top = (y - 40) + 'px';
-            
-            setTimeout(() => {
-                document.addEventListener('click', () => menu.style.display = 'none', { once: true });
-            }, 100);
+            setTimeout(() => { document.addEventListener('click', () => menu.style.display = 'none', { once: true }); }, 100);
         }
         
-        function iniciarModoSelecao() { 
-            modoSelecao = true; 
-            document.getElementById('menuContexto').style.display = 'none';
-            mensagensSelecionadas.clear();
-            document.querySelectorAll('.mensagem-selecionada').forEach(el => {
-                el.classList.remove('mensagem-selecionada');
-            });
-            atualizarBarraSelecao();
-        }
-        
-        function selecionarMensagem(id) {
-            if (!modoSelecao) return;
-            
-            if (mensagensSelecionadas.has(id)) {
-                mensagensSelecionadas.delete(id);
-            } else {
-                mensagensSelecionadas.add(id);
-            }
-            
-            const mensagemDiv = document.querySelector(`.mensagem[data-id="${id}"]`);
-            if (mensagemDiv) {
-                if (mensagensSelecionadas.has(id)) {
-                    mensagemDiv.classList.add('mensagem-selecionada');
-                } else {
-                    mensagemDiv.classList.remove('mensagem-selecionada');
-                }
-            }
-            
-            atualizarBarraSelecao();
-        }
-        
+        function iniciarModoSelecao() { modoSelecao = true; document.getElementById('menuContexto').style.display = 'none'; mensagensSelecionadas.clear(); document.querySelectorAll('.mensagem-selecionada').forEach(el => el.classList.remove('mensagem-selecionada')); atualizarBarraSelecao(); }
+        function selecionarMensagem(id) { if (!modoSelecao) return; if (mensagensSelecionadas.has(id)) mensagensSelecionadas.delete(id); else mensagensSelecionadas.add(id); const div = document.querySelector(`.mensagem[data-id="${id}"]`); if (div) { if (mensagensSelecionadas.has(id)) div.classList.add('mensagem-selecionada'); else div.classList.remove('mensagem-selecionada'); } atualizarBarraSelecao(); }
         function atualizarBarraSelecao() {
             const barra = document.getElementById('selectionBar');
             if (mensagensSelecionadas.size > 0) {
                 barra.style.display = 'flex';
-                barra.innerHTML = `
-                    <span>📌 ${mensagensSelecionadas.size} mensagem(ns) selecionada(s)</span>
-                    <div>
-                        <button onclick="apagarSelecionadas()">🗑️ Apagar selecionadas</button>
-                        <button onclick="apagarTudo()">🗑️ Apagar todas</button>
-                        <button onclick="cancelarSelecao()">✖️ Cancelar</button>
-                    </div>
-                `;
+                barra.innerHTML = `<span>📌 ${mensagensSelecionadas.size} mensagem(ns) selecionada(s)</span><div><button onclick="apagarSelecionadas()">🗑️ Apagar selecionadas</button><button onclick="apagarTudo()">🗑️ Apagar todas</button><button onclick="cancelarSelecao()">✖️ Cancelar</button></div>`;
             } else if (modoSelecao) {
                 barra.style.display = 'flex';
-                barra.innerHTML = `
-                    <span>📌 Modo seleção ativado. Toque nas mensagens para selecionar.</span>
-                    <div>
-                        <button onclick="cancelarSelecao()">✖️ Cancelar</button>
-                    </div>
-                `;
-            } else {
-                barra.style.display = 'none';
-            }
+                barra.innerHTML = `<span>📌 Modo seleção ativado. Toque nas mensagens para selecionar.</span><div><button onclick="cancelarSelecao()">✖️ Cancelar</button></div>`;
+            } else { barra.style.display = 'none'; }
         }
-        
-        function cancelarSelecao() { 
-            modoSelecao = false; 
-            mensagensSelecionadas.clear(); 
-            atualizarBarraSelecao(); 
-            document.querySelectorAll('.mensagem-selecionada').forEach(el => {
-                el.classList.remove('mensagem-selecionada');
-            });
-        }
-        
-        function responderMsg(id, texto) {
-            document.getElementById('menuContexto').style.display = 'none';
-            respondendoMsg = { id, texto };
-            document.getElementById('respostaOriginal').innerText = texto;
-            document.getElementById('respostaTexto').value = '';
-            document.getElementById('modalResponder').style.display = 'flex';
-        }
-        
-        async function enviarResposta() {
-            const resposta = document.getElementById('respostaTexto').value.trim();
-            if (!resposta) return;
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            await db.collection('chats').doc(chatId).collection('mensagens').add({
-                texto: resposta, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id,
-                timestamp: new Date(), editado: false,
-                resposta: { autor: usuarioAtual.nome, texto: respondendoMsg.texto, msgId: respondendoMsg.id }
-            });
-            fecharModalResponder();
-        }
-        
+        function cancelarSelecao() { modoSelecao = false; mensagensSelecionadas.clear(); atualizarBarraSelecao(); document.querySelectorAll('.mensagem-selecionada').forEach(el => el.classList.remove('mensagem-selecionada')); }
+        function responderMsg(id, texto) { document.getElementById('menuContexto').style.display = 'none'; respondendoMsg = { id, texto }; document.getElementById('respostaOriginal').innerText = texto; document.getElementById('respostaTexto').value = ''; document.getElementById('modalResponder').style.display = 'flex'; }
+        async function enviarResposta() { const resposta = document.getElementById('respostaTexto').value.trim(); if (!resposta) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: resposta, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false, resposta: { autor: usuarioAtual.nome, texto: respondendoMsg.texto, msgId: respondendoMsg.id } }); fecharModalResponder(); }
         function editarMsg() { document.getElementById('menuContexto').style.display = 'none'; document.getElementById('editarTexto').value = mensagemSelecionada.texto; document.getElementById('modalEditar').style.display = 'flex'; }
-        
-        async function apagarMsg() { 
-            document.getElementById('menuContexto').style.display = 'none'; 
-            if (confirm('Apagar esta mensagem apenas para você?')) { 
-                const msgElements = document.querySelectorAll('.mensagem');
-                for (let el of msgElements) {
-                    if (el.getAttribute('data-id') === mensagemSelecionada.id) {
-                        el.classList.add('mensagem-apagando');
-                        break;
-                    }
-                }
-                setTimeout(async () => {
-                    const chatId = obterChatId(usuarioAtual.id, chatCom.id); 
-                    const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id);
-                    const doc = await msgRef.get();
-                    if (doc.exists) {
-                        const data = doc.data();
-                        const apagadoPor = data.apagadoPor || [];
-                        if (!apagadoPor.includes(usuarioAtual.id)) {
-                            apagadoPor.push(usuarioAtual.id);
-                            await msgRef.update({ apagadoPor: apagadoPor });
-                        }
-                    }
-                }, 150);
-            } 
-        }
-        
+        async function apagarMsg() { document.getElementById('menuContexto').style.display = 'none'; if (confirm('Apagar esta mensagem apenas para você?')) { const chatId = obterChatId(usuarioAtual.id, chatCom.id); const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id); const doc = await msgRef.get(); if (doc.exists) { const apagadoPor = doc.data().apagadoPor || []; if (!apagadoPor.includes(usuarioAtual.id)) { apagadoPor.push(usuarioAtual.id); await msgRef.update({ apagadoPor: apagadoPor }); } } } }
         async function salvarEdicao() { const novo = document.getElementById('editarTexto').value.trim(); if (!novo) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ texto: novo, editado: true }); fecharModalEditar(); }
         function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false }); input.value = ''; }
+        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false }); input.value = ''; document.getElementById('emojiPicker').style.display = 'none'; }
         function obterChatId(a,b) { return a < b ? `${a}_${b}` : `${b}_${a}`; }
         
         async function fazerLogin() {
@@ -849,12 +708,7 @@
             if (!nome || !email || !senha) { err.style.display='block'; err.innerText='Preencha nome, e-mail e senha'; return; }
             if (senha.length < 6) { err.style.display='block'; err.innerText='Senha mínimo 6'; return; }
             const existe = await db.collection('usuarios').where('idUnico', '==', idUnico).get();
-            if (!existe.empty) { 
-                const novoId = gerarIdAleatorio();
-                document.getElementById('idGerado').innerText = novoId;
-                err.style.display='block'; err.innerText='Este ID já existe. Geramos outro para você. Tente novamente.';
-                return;
-            }
+            if (!existe.empty) { const novoId = gerarIdAleatorio(); document.getElementById('idGerado').innerText = novoId; err.style.display='block'; err.innerText='Este ID já existe. Geramos outro para você. Tente novamente.'; return; }
             try {
                 const r = await auth.createUserWithEmailAndPassword(email, senha);
                 await db.collection('usuarios').doc(r.user.uid).set({ nome, email, idUnico, profissao: prof || '', bio: bio || '', criadoEm: new Date(), online: true });
