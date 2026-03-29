@@ -35,7 +35,17 @@
         }
         
         body { background: linear-gradient(135deg, #0a2b3e 0%, #1a4a6f 100%); font-family: 'Inter', sans-serif; }
-        .app { max-width: 600px; margin: 0 auto; background: var(--bg-secondary); height: 100vh; display: flex; flex-direction: column; box-shadow: 0 0 40px rgba(0,0,0,0.1); transition: all 0.3s; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+        .app {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+        }
         
         .header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { display: flex; align-items: center; gap: 8px; }
@@ -64,7 +74,16 @@
         .chat-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; position: relative; }
         .chat-nome { font-weight: 600; font-size: 16px; }
         .chat-status { font-size: 11px; opacity: 0.8; }
-        .mensagens-area { flex: 1; overflow-y: auto; padding: 15px; background: var(--bg-primary); display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+        .mensagens-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
         .mensagem { margin-bottom: 12px; display: flex; width: 100%; user-select: none; -webkit-tap-highlight-color: transparent; }
         .mensagem.enviada { justify-content: flex-end; }
         .mensagem.recebida { justify-content: flex-start; }
@@ -137,6 +156,7 @@
             align-items: center;
             position: relative;
             z-index: 10;
+            background-color: var(--bg-secondary);
         }
         .input-wrapper {
             flex: 1;
@@ -147,6 +167,7 @@
             border-radius: 24px;
             padding: 4px 8px;
             border: 1px solid var(--border);
+            cursor: text;
         }
         .input-mensagem {
             flex: 1;
@@ -158,6 +179,9 @@
             background: transparent;
             color: var(--text-primary);
             max-height: 100px;
+            outline: none;
+            -webkit-appearance: none;
+            touch-action: manipulation;
         }
         .input-mensagem:focus {
             outline: none;
@@ -417,7 +441,6 @@
         let tema = localStorage.getItem('tema') || 'claro';
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
         
-        // Navegação por pilha (stack)
         let navigationStack = [];
         
         const emojisData = {
@@ -454,6 +477,23 @@
                 } else if (lastState.type === 'responder') {
                     fecharModalResponder();
                 }
+            }
+        }
+        
+        function garantirFocoInput() {
+            const input = document.getElementById('msgInput');
+            const wrapper = document.querySelector('.input-wrapper');
+            
+            if (input && wrapper) {
+                wrapper.addEventListener('click', function(e) {
+                    if (e.target !== input) {
+                        input.focus();
+                    }
+                });
+                input.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    input.focus();
+                });
             }
         }
         
@@ -815,8 +855,16 @@
                     </div>
                     <button class="btn-enviar" onclick="enviarMsg()">➤</button>
                 </div>`;
-            document.getElementById('msgInput')?.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
+            const input = document.getElementById('msgInput');
+            if (input) {
+                input.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
+                setTimeout(() => {
+                    input.focus();
+                    input.click();
+                }, 300);
+            }
             
+            garantirFocoInput();
             marcarMensagensComoLidas();
             
             carregarMensagens();
@@ -1208,7 +1256,6 @@
         
         async function fazerLogout() { if (unsubscribeMessages) unsubscribeMessages(); if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false }); await auth.signOut(); usuarioAtual = null; renderizar(); }
         
-        // Gerenciar botão voltar do celular
         window.addEventListener('popstate', function(event) {
             const emojiPicker = document.getElementById('emojiPicker');
             if (emojiPicker && emojiPicker.style.display === 'flex') {
