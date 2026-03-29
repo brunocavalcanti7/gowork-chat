@@ -356,7 +356,17 @@
         .modal-content button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
         .btn-primary { background: var(--accent); color: white; }
         .btn-secondary { background: var(--border); color: var(--text-primary); }
-        .menu-contexto { position: fixed; background: var(--bg-secondary); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; display: none; overflow: hidden; border: 1px solid var(--border); max-width: 220px; }
+        .menu-contexto {
+            position: fixed;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: none;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            max-width: 220px;
+        }
         .menu-contexto button { display: block; width: 100%; padding: 10px 16px; background: var(--bg-secondary); border: none; text-align: left; cursor: pointer; font-size: 13px; color: var(--text-primary); }
         .loading { text-align: center; padding: 30px; color: var(--text-secondary); font-size: 13px; }
         .form-card { background: var(--bg-secondary); border-radius: 24px; padding: 28px 24px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border); }
@@ -478,32 +488,51 @@
         
         // ==================== AJUSTE DE ALTURA PARA TECLADO ====================
         let alturaOriginal = window.innerHeight;
+        let tecladoAberto = false;
         
         function ajustarAlturaApp() {
             const app = document.querySelector('.app');
+            const inputArea = document.querySelector('.input-area');
+            const mensagensArea = document.getElementById('mensagensArea');
+            
             if (!app) return;
             
             const alturaAtual = window.innerHeight;
             const visualHeight = window.visualViewport ? window.visualViewport.height : alturaAtual;
             
-            app.style.height = visualHeight + 'px';
-            app.style.position = 'fixed';
-            app.style.top = '0';
-            app.style.left = '0';
-            app.style.right = '0';
-            app.style.overflow = 'hidden';
-            
-            setTimeout(() => {
-                const mensagensArea = document.getElementById('mensagensArea');
+            if (alturaAtual < alturaOriginal) {
+                tecladoAberto = true;
+                app.style.height = visualHeight + 'px';
+                app.style.position = 'fixed';
+                app.style.top = '0';
+                app.style.left = '0';
+                app.style.right = '0';
+                app.style.overflow = 'hidden';
+                
+                if (mensagensArea) {
+                    setTimeout(() => {
+                        mensagensArea.scrollTop = mensagensArea.scrollHeight;
+                    }, 50);
+                }
+                
+                if (inputArea) {
+                    setTimeout(() => {
+                        inputArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 100);
+                }
+            } else if (tecladoAberto) {
+                tecladoAberto = false;
+                app.style.height = '100vh';
+                app.style.height = '-webkit-fill-available';
+                app.style.position = 'relative';
+                app.style.overflow = 'auto';
+                
                 if (mensagensArea) {
                     mensagensArea.scrollTop = mensagensArea.scrollHeight;
                 }
-                
-                const input = document.getElementById('msgInput');
-                if (input) {
-                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }, 50);
+            }
+            
+            alturaOriginal = alturaAtual;
         }
         
         window.addEventListener('resize', () => {
@@ -906,7 +935,7 @@
             modoSelecao = false;
             mensagensSelecionadas.clear();
             document.getElementById('app').innerHTML = `
-                <div class="app"><div class="chat-header"><button class="btn-icon" style="background:none;" onclick="voltar()">←</button><div class="chat-header-info" onclick="verPerfilChat()"><div class="chat-avatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div><div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div></div><div><button class="btn-icon" style="background:none;" onclick="abrirMenuChat()">⋮</button></div></div>
+                <div class="app"><div class="chat-header"><button class="btn-icon" style="background:none;" onclick="voltar()">←</button><div class="chat-header-info" onclick="verPerfilChat()"><div class="chat-avatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div><div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div></div><div><button class="btn-icon" style="background:none;" onclick="abrirMenuChat(event)">⋮</button></div></div>
                 <div id="selectionBar" style="display:none;" class="selection-bar"></div>
                 <div id="respostaPreview" style="display:none;" class="resposta-preview"></div>
                 <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
@@ -1004,21 +1033,54 @@
             document.querySelectorAll('.mensagem.recebida').forEach(msg => observer.observe(msg));
         }
         
-        function abrirMenuChat() {
+        function abrirMenuChat(event) {
+            event.stopPropagation();
             const menu = document.getElementById('menuContexto');
+            
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+                if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'menu') {
+                    navigationStack.pop();
+                }
+                return;
+            }
+            
             menu.innerHTML = `<button onclick="apagarTudo()">🗑️ Apagar todas</button><button onclick="bloquearUsuario('${chatCom.id}')">🔒 Bloquear usuário</button>`;
+            
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuWidth = 200;
+            const menuHeight = 90;
+            
+            let left = rect.left + rect.width / 2 - menuWidth / 2;
+            let top = rect.bottom + 5;
+            
+            if (left < 10) left = 10;
+            if (left + menuWidth > window.innerWidth - 10) left = window.innerWidth - menuWidth - 10;
+            if (top + menuHeight > window.innerHeight - 10) top = rect.top - menuHeight - 5;
+            if (top < 10) top = 10;
+            
             menu.style.display = 'block';
-            menu.style.left = '50%';
-            menu.style.top = '50%';
-            menu.style.transform = 'translate(-50%, -50%)';
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+            menu.style.transform = 'none';
+            
             pushNavigation({ type: 'menu' });
-            setTimeout(() => {
-                document.addEventListener('click', () => {
+            
+            const fecharMenu = (e) => {
+                if (!menu.contains(e.target) && e.target !== btn) {
                     menu.style.display = 'none';
                     if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'menu') {
                         navigationStack.pop();
                     }
-                }, { once: true });
+                    document.removeEventListener('click', fecharMenu);
+                    document.removeEventListener('touchstart', fecharMenu);
+                }
+            };
+            
+            setTimeout(() => {
+                document.addEventListener('click', fecharMenu);
+                document.addEventListener('touchstart', fecharMenu);
             }, 100);
         }
         
