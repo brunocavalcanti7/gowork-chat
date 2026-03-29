@@ -47,9 +47,10 @@
             box-shadow: 0 0 40px rgba(0,0,0,0.1);
             transition: all 0.3s;
             position: relative;
+            overflow: hidden;
         }
         
-        .header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .logo { display: flex; align-items: center; gap: 8px; }
         .logo-icon { font-size: 24px; }
         .header h1 { font-size: 18px; font-weight: 600; }
@@ -71,16 +72,17 @@
         .usuario-profissao { font-size: 11px; color: var(--accent); margin-top: 2px; }
         .ultima-msg { font-size: 11px; color: var(--text-secondary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
         
-        .chat-header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; align-items: center; gap: 12px; }
+        .chat-header { background: var(--header-bg); color: white; padding: 15px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
         .chat-header-info { flex: 1; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .chat-avatar { width: 40px; height: 40px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; position: relative; }
         .chat-nome { font-weight: 600; font-size: 16px; }
         .chat-status { font-size: 11px; opacity: 0.8; }
+        
         .mensagens-area {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: 20px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
             background: var(--bg-primary);
             display: flex;
             flex-direction: column;
@@ -142,7 +144,7 @@
             font-weight: bold;
         }
         
-        .selection-bar { background: var(--accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: white; animation: slideDown 0.2s ease; }
+        .selection-bar { background: var(--accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: white; animation: slideDown 0.2s ease; flex-shrink: 0; }
         .selection-bar button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-left: 8px; }
         
         @keyframes slideDown {
@@ -161,6 +163,7 @@
             position: relative;
             z-index: 10;
             background-color: var(--bg-secondary);
+            flex-shrink: 0;
         }
         .input-wrapper {
             flex: 1;
@@ -380,6 +383,19 @@
         body.fonte-normal { font-size: 14px; }
         body.fonte-grande { font-size: 16px; }
         @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
+        
+        /* Correção para safe area */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .input-area {
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+            .emoji-picker {
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
+            }
+            .mensagens-area {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 <body>
@@ -447,7 +463,6 @@
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
         
         let navigationStack = [];
-        let alturaOriginal = window.innerHeight;
         
         const emojisData = {
             '😀 Sorrisos': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
@@ -462,39 +477,45 @@
         let categoriaAtual = '😀 Sorrisos';
         
         // ==================== AJUSTE DE ALTURA PARA TECLADO ====================
+        let alturaOriginal = window.innerHeight;
+        
         function ajustarAlturaApp() {
             const app = document.querySelector('.app');
             if (!app) return;
             
             const alturaAtual = window.innerHeight;
+            const visualHeight = window.visualViewport ? window.visualViewport.height : alturaAtual;
             
-            if (alturaAtual < alturaOriginal) {
-                app.style.height = alturaAtual + 'px';
-                app.style.position = 'fixed';
-                app.style.top = '0';
-                app.style.left = '0';
-                app.style.right = '0';
-                
+            app.style.height = visualHeight + 'px';
+            app.style.position = 'fixed';
+            app.style.top = '0';
+            app.style.left = '0';
+            app.style.right = '0';
+            app.style.overflow = 'hidden';
+            
+            setTimeout(() => {
                 const mensagensArea = document.getElementById('mensagensArea');
                 if (mensagensArea) {
-                    setTimeout(() => {
-                        mensagensArea.scrollTop = mensagensArea.scrollHeight;
-                    }, 100);
+                    mensagensArea.scrollTop = mensagensArea.scrollHeight;
                 }
-            } else {
-                app.style.height = '100vh';
-                app.style.height = '-webkit-fill-available';
-                app.style.position = 'relative';
-            }
-            
-            alturaOriginal = alturaAtual;
+                
+                const input = document.getElementById('msgInput');
+                if (input) {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
         }
         
-        window.addEventListener('resize', ajustarAlturaApp);
+        window.addEventListener('resize', () => {
+            setTimeout(ajustarAlturaApp, 10);
+        });
+        
         window.addEventListener('load', ajustarAlturaApp);
         
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', ajustarAlturaApp);
+            window.visualViewport.addEventListener('resize', () => {
+                setTimeout(ajustarAlturaApp, 10);
+            });
         }
         
         function pushNavigation(state) {
