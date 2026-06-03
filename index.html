@@ -44,7 +44,6 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 40px rgba(0,0,0,0.1);
-            transition: all 0.3s;
             position: relative;
         }
         
@@ -54,14 +53,12 @@
         .header h1 { font-size: 18px; font-weight: 600; }
         .header span { color: #60a5fa; }
         .btn-icon { background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 50%; cursor: pointer; font-size: 18px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .btn-icon:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
         .btn-sair { background: rgba(255,255,255,0.15); border: none; color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
         
         .lista-usuarios { flex: 1; overflow-y: auto; padding: 8px; background: var(--bg-primary); }
         .secao { margin-bottom: 20px; }
         .secao-titulo { font-weight: 600; color: var(--text-primary); margin: 12px 12px 8px 12px; padding-bottom: 5px; border-bottom: 2px solid var(--accent); display: inline-block; font-size: 13px; }
         .usuario-item { display: flex; align-items: center; padding: 12px 14px; margin: 3px 8px; background: var(--bg-secondary); border-radius: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .usuario-item:active { background: var(--bg-primary); transform: scale(0.98); }
         .usuario-avatar { position: relative; width: 48px; height: 48px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 18px; margin-right: 12px; }
         .status-online { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--online); border-radius: 50%; border: 2px solid white; }
         .status-offline { position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: var(--offline); border-radius: 50%; border: 2px solid white; }
@@ -80,65 +77,28 @@
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            padding-bottom: 80px;
             background: var(--bg-primary);
             display: flex;
             flex-direction: column;
-            -webkit-overflow-scrolling: touch;
         }
-        .mensagem {
-            margin-bottom: 12px;
-            display: flex;
-            width: 100%;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            cursor: default;
-        }
+        .mensagem { margin-bottom: 12px; display: flex; width: 100%; user-select: none; -webkit-tap-highlight-color: transparent; cursor: default; }
         .mensagem.enviada { justify-content: flex-end; }
         .mensagem.recebida { justify-content: flex-start; }
-        .mensagem-bolha {
-            max-width: 75%;
-            padding: 8px 14px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            transition: all 0.2s;
-            position: relative;
-            cursor: pointer;
-        }
+        .mensagem-bolha { max-width: 75%; padding: 8px 14px; border-radius: 18px; word-wrap: break-word; transition: all 0.2s; position: relative; cursor: pointer; }
         .mensagem.enviada .mensagem-bolha { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
         .mensagem.recebida .mensagem-bolha { background: var(--bg-secondary); color: var(--text-primary); border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         .mensagem-texto { font-size: 14px; line-height: 1.4; }
-        .mensagem-texto a { color: inherit; text-decoration: underline; }
         .mensagem-resposta { font-size: 12px; padding: 6px 10px; margin-bottom: 6px; border-radius: 12px; background: rgba(0,0,0,0.05); border-left: 3px solid var(--accent); }
-        .mensagem-nome {
-            font-size: 11px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        .mensagem.enviada .mensagem-nome {
-            color: rgba(255, 255, 255, 0.8);
-            text-align: right;
-        }
-        .mensagem.recebida .mensagem-nome {
-            color: var(--accent);
-        }
+        .mensagem-nome { font-size: 11px; font-weight: 500; margin-bottom: 4px; }
+        .mensagem.enviada .mensagem-nome { color: rgba(255, 255, 255, 0.8); text-align: right; }
+        .mensagem.recebida .mensagem-nome { color: var(--accent); }
         .mensagem-hora { font-size: 9px; margin-top: 4px; opacity: 0.7; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
         .mensagem-editado { font-size: 8px; margin-left: 4px; opacity: 0.6; }
         
-        .visto-icon {
-            font-size: 10px;
-            margin-left: 4px;
-            font-weight: bold;
-        }
-        .visto-enviado {
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .visto-lido {
-            color: #60a5fa;
-        }
-        body.dark .visto-lido {
-            color: #60a5fa;
-        }
+        .visto-icon { font-size: 10px; margin-left: 4px; font-weight: bold; }
+        .visto-enviado { color: rgba(255, 255, 255, 0.7); }
+        .visto-lido { color: #60a5fa; }
         
         .mensagem-selecionada .mensagem-bolha {
             background: var(--accent-dark) !important;
@@ -158,15 +118,10 @@
         
         .selection-bar { background: var(--accent); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: white; animation: slideDown 0.2s ease; flex-shrink: 0; }
         .selection-bar button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-left: 8px; }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         
         .input-area {
             padding: 12px 15px;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
             background: var(--bg-secondary);
             border-top: 1px solid var(--border);
             display: flex;
@@ -196,11 +151,8 @@
             color: var(--text-primary);
             max-height: 100px;
             outline: none;
-            -webkit-appearance: none;
-            touch-action: manipulation;
         }
-        .input-mensagem:focus { outline: none; }
-        .btn-localizacao {
+        .btn-localizacao, .btn-input {
             background: transparent;
             border: none;
             color: var(--text-secondary);
@@ -214,22 +166,6 @@
             justify-content: center;
             transition: all 0.2s;
         }
-        .btn-localizacao:active { transform: scale(0.95); background: var(--bg-primary); }
-        .btn-input {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .btn-input:active { transform: scale(0.95); background: var(--bg-primary); }
         .btn-enviar {
             background: var(--accent);
             border: none;
@@ -242,9 +178,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
-        .btn-enviar:active { transform: scale(0.95); }
         .resposta-preview { background: var(--bg-primary); padding: 8px 15px; border-left: 3px solid var(--accent); font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
         
         .emoji-picker {
@@ -255,7 +189,6 @@
             background: var(--bg-secondary);
             border-radius: 24px 24px 0 0;
             padding: 16px;
-            padding-bottom: max(16px, env(safe-area-inset-bottom));
             display: none;
             z-index: 1000;
             box-shadow: 0 -4px 25px rgba(0,0,0,0.15);
@@ -265,82 +198,16 @@
             flex-direction: column;
             animation: slideUp 0.3s ease;
         }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        
-        .emoji-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        .emoji-header span {
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--accent);
-        }
-        
-        .emoji-categorias {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 8px;
-            scrollbar-width: thin;
-            flex-shrink: 0;
-        }
-        .emoji-categorias::-webkit-scrollbar { height: 3px; }
-        .emoji-categorias::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
-        .emoji-categorias::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-        .emoji-cat-btn {
-            background: var(--bg-primary);
-            border: none;
-            padding: 8px 18px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .emoji-header { display: flex; justify-content: center; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .emoji-categorias { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; scrollbar-width: thin; flex-shrink: 0; }
+        .emoji-cat-btn { background: var(--bg-primary); border: none; padding: 8px 18px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-secondary); transition: all 0.2s; white-space: nowrap; }
         .emoji-cat-btn.active { background: var(--accent); color: white; }
-        
-        .emoji-grid-container {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-        .emoji-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(48px, 58px));
-            gap: 6px;
-            padding-bottom: 10px;
-        }
-        .emoji {
-            font-size: 32px;
-            cursor: pointer;
-            padding: 8px;
-            text-align: center;
-            border-radius: 14px;
-            transition: all 0.1s;
-            background: var(--bg-primary);
-        }
-        .emoji:active { transform: scale(1.1); background: var(--accent-light); }
+        .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 58px)); gap: 6px; padding-bottom: 10px; max-height: 250px; overflow-y: auto; }
+        .emoji { font-size: 32px; cursor: pointer; padding: 8px; text-align: center; border-radius: 14px; transition: all 0.1s; background: var(--bg-primary); }
         
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; display: none; backdrop-filter: blur(4px); }
         .modal-content { background: var(--bg-secondary); border-radius: 24px; padding: 24px; width: 90%; max-width: 350px; color: var(--text-primary); }
-        .modal-content h3 { margin-bottom: 20px; }
-        .modal-content input, .modal-content textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-primary); color: var(--text-primary); }
-        .modal-content button { width: 100%; padding: 12px; margin-top: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; }
-        .btn-primary { background: var(--accent); color: white; }
-        .btn-secondary { background: var(--border); color: var(--text-primary); }
         .menu-contexto {
             position: fixed;
             background: var(--bg-secondary);
@@ -378,12 +245,6 @@
         body.fonte-normal { font-size: 14px; }
         body.fonte-grande { font-size: 16px; }
         @media (max-width: 600px) { .mensagem-bolha { max-width: 85%; } }
-        
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .mensagens-area { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
-            .input-area { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
-            .emoji-picker { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
-        }
     </style>
 </head>
 <body>
@@ -391,33 +252,8 @@
     <div id="emojiPicker" class="emoji-picker"></div>
     <div id="menuContexto" class="menu-contexto"></div>
     <div id="modalConfig" class="modal"><div class="modal-content" id="modalConfigContent"></div></div>
-    <div id="modalEditar" class="modal">
-        <div class="modal-content">
-            <h3>✏️ Editar mensagem</h3>
-            <input type="text" id="editarTexto">
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-primary" onclick="salvarEdicao()">Salvar</button>
-                <button class="btn-secondary" onclick="fecharModalEditar()">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    <div id="modalResponder" class="modal">
-        <div class="modal-content">
-            <h3>💬 Responder</h3>
-            <div style="background: var(--bg-primary); padding: 10px; border-radius: 12px; margin-bottom: 12px;">
-                <strong>Respondendo a:</strong>
-                <p id="respostaOriginal" style="margin-top: 5px; font-style: italic;"></p>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <textarea id="respostaTexto" rows="3" placeholder="Digite sua resposta..." style="flex: 1;"></textarea>
-                <button class="btn-localizacao" onclick="mostrarEmojisResposta()" style="width: 40px; height: 40px;">😀</button>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-primary" onclick="enviarResposta()">Enviar</button>
-                <button class="btn-secondary" onclick="fecharModalResponder()">Cancelar</button>
-            </div>
-        </div>
-    </div>
+    <div id="modalEditar" class="modal"><div class="modal-content"><h3>✏️ Editar mensagem</h3><input type="text" id="editarTexto"><div style="display: flex; gap: 10px; margin-top: 15px;"><button class="btn-primary" onclick="salvarEdicao()">Salvar</button><button class="btn-secondary" onclick="fecharModalEditar()">Cancelar</button></div></div></div>
+    <div id="modalResponder" class="modal"><div class="modal-content"><h3>💬 Responder</h3><div style="background: var(--bg-primary); padding: 10px; border-radius: 12px; margin-bottom: 12px;"><strong>Respondendo a:</strong><p id="respostaOriginal" style="margin-top: 5px; font-style: italic;"></p></div><div style="display: flex; gap: 8px; align-items: center;"><textarea id="respostaTexto" rows="3" placeholder="Digite sua resposta..." style="flex: 1;"></textarea><button class="btn-localizacao" onclick="mostrarEmojisResposta()" style="width: 40px; height: 40px;">😀</button></div><div style="display: flex; gap: 10px; margin-top: 15px;"><button class="btn-primary" onclick="enviarResposta()">Enviar</button><button class="btn-secondary" onclick="fecharModalResponder()">Cancelar</button></div></div></div>
 
     <script>
         const firebaseConfig = {
@@ -449,31 +285,34 @@
         
         let tema = localStorage.getItem('tema') || 'claro';
         let tamanhoFonte = localStorage.getItem('fonte') || 'normal';
-        
         let navigationStack = [];
         
         const emojisData = {
-            '😀 Sorrisos': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
-            '❤️ Corações': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '💌', '💋'],
-            '👋 Gestos': ['👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👏', '🙌', '🤝', '🙏', '💪', '🦾', '🦿', '🦵', '🦶', '👣', '👂', '🦻', '👃', '🧠', '🫀', '🫁', '🦷', '🦴', '👀', '👁️', '👅', '👄', '💋'],
-            '🍔 Comidas': ['🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🫔', '🥙', '🧆', '🥚', '🍳', '🥘', '🍲', '🫕', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡'],
-            '⚽ Esportes': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '⛹️', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️'],
-            '🚗 Veículos': ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🏍️', '🛵', '🚲', '🛴', '🛹', '🛼', '🚁', '✈️', '🛩️', '🛫', '🛬', '🪂', '💺', '🚀', '🛸', '🚉', '🚊', '🚝', '🚞', '🚋', '🚟', '🚠', '🚡', '🚂', '🚆', '🚇', '🚈', '🚃', '🚄', '🚅', '🚊'],
-            '⭐ Símbolos': ['⭐', '🌟', '✨', '💫', '🔥', '💥', '💢', '💦', '💨', '💤', '💪', '🦷', '🧠', '🫀', '🫁', '🦴', '👁️', '👀', '👂', '🦻', '👃', '👄', '👅', '💋', '🦷', '🧠', '🫀', '🫁', '💪', '🦾', '🦿', '🦵', '🦶', '👣', '👂', '🦻', '👃', '🧬', '🩸', '🩺']
+            '😀 Sorrisos': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳'],
+            '❤️ Corações': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❤️‍🔥', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟'],
+            '👋 Gestos': ['👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👏', '🙌', '🤝', '🙏', '💪'],
+            '🍔 Comidas': ['🍎', '🍕', '🍔', '🍟', '🌭', '🍦', '🍩', '🍪', '☕', '🍺', '🥂', '🍷'],
+            '⚽ Esportes': ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏆', '🥇', '🥈', '🥉'],
+            '🚗 Veículos': ['🚗', '🚕', '🚙', '🚌', '🚎', '🚓', '🚑', '🚒', '✈️', '🚀', '🛸'],
+            '⭐ Símbolos': ['⭐', '🌟', '✨', '💫', '🔥', '💥', '💢', '💦', '💨', '💤', '💪']
         };
         
         let categoriaAtual = '😀 Sorrisos';
         
-        function ajustarScroll() {
-            const mensagensArea = document.getElementById('mensagensArea');
-            if (mensagensArea) {
+        // ==================== AJUSTE DO TECLADO ====================
+        let alturaAnterior = window.innerHeight;
+        
+        window.addEventListener('resize', function() {
+            const alturaAtual = window.innerHeight;
+            const mensagens = document.getElementById('mensagensArea');
+            
+            if (alturaAtual < alturaAnterior) {
                 setTimeout(() => {
-                    mensagensArea.scrollTop = mensagensArea.scrollHeight;
+                    if (mensagens) mensagens.scrollTop = mensagens.scrollHeight;
                 }, 100);
             }
-        }
-        
-        window.addEventListener('resize', ajustarScroll);
+            alturaAnterior = alturaAtual;
+        });
         
         function pushNavigation(state) {
             navigationStack.push(state);
@@ -485,567 +324,6 @@
                 const lastState = navigationStack.pop();
                 if (lastState.type === 'chat') voltar();
                 else if (lastState.type === 'emoji') fecharEmojiPicker();
-                else if (lastState.type === 'menu') { const menu = document.getElementById('menuContexto'); if (menu) menu.style.display = 'none'; }
+                else if (lastState.type === 'menu') document.getElementById('menuContexto').style.display = 'none';
                 else if (lastState.type === 'config') fecharModalConfig();
-                else if (lastState.type === 'editar') fecharModalEditar();
-                else if (lastState.type === 'responder') fecharModalResponder();
-            }
-        }
-        
-        function garantirFocoInput() {
-            const input = document.getElementById('msgInput');
-            const wrapper = document.querySelector('.input-wrapper');
-            if (input && wrapper) {
-                wrapper.addEventListener('click', (e) => { if (e.target !== input) input.focus(); });
-                input.addEventListener('touchstart', (e) => { e.stopPropagation(); input.focus(); });
-            }
-        }
-        
-        function aplicarTema() {
-            if (tema === 'escuro') document.body.classList.add('dark');
-            else document.body.classList.remove('dark');
-            document.body.className = document.body.className.replace(/fonte-(pequena|normal|grande)/, '');
-            document.body.classList.add(`fonte-${tamanhoFonte}`);
-        }
-        
-        function gerarIdAleatorio() {
-            const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-            let id = '';
-            for (let i = 0; i < 8; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
-            return `prestador_${id}`;
-        }
-        
-        function mostrarEmojis(targetInputId) {
-            const picker = document.getElementById('emojiPicker');
-            if (picker.style.display === 'flex') { fecharEmojiPicker(); return; }
-            atualizarEmojiPicker(targetInputId);
-            picker.style.display = 'flex';
-            picker.dataset.target = targetInputId;
-            pushNavigation({ type: 'emoji' });
-        }
-        
-        function atualizarEmojiPicker(targetId) {
-            const picker = document.getElementById('emojiPicker');
-            let html = `<div class="emoji-header"><span>😀 Escolha um emoji</span></div><div class="emoji-categorias" id="emojiCategorias">`;
-            for (const cat of Object.keys(emojisData)) {
-                html += `<button class="emoji-cat-btn ${cat === categoriaAtual ? 'active' : ''}" onclick="mudarCategoriaEmoji('${cat}', '${targetId}')">${cat}</button>`;
-            }
-            html += `</div><div class="emoji-grid-container" id="emojiGridContainer"><div class="emoji-grid" id="emojiGrid">`;
-            emojisData[categoriaAtual].forEach(e => { html += `<span class="emoji" onclick="inserirEmoji('${e}', '${targetId}')">${e}</span>`; });
-            html += `</div></div>`;
-            picker.innerHTML = html;
-            setTimeout(() => {
-                const activeBtn = document.querySelector('.emoji-cat-btn.active');
-                if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }, 50);
-        }
-        
-        function mudarCategoriaEmoji(categoria, targetId) { categoriaAtual = categoria; atualizarEmojiPicker(targetId); }
-        function mostrarEmojisPrincipal() { mostrarEmojis('msgInput'); }
-        function mostrarEmojisResposta() { mostrarEmojis('respostaTexto'); }
-        function fecharEmojiPicker() { document.getElementById('emojiPicker').style.display = 'none'; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'emoji') navigationStack.pop(); }
-        function inserirEmoji(emoji, targetId) { const input = document.getElementById(targetId); if (input) { input.value += emoji; input.focus(); } fecharEmojiPicker(); }
-        function copiarMensagem() { const texto = mensagemSelecionada.texto; navigator.clipboard.writeText(texto).then(() => alert('Mensagem copiada!')).catch(() => alert('Não foi possível copiar')); document.getElementById('menuContexto').style.display = 'none'; }
-        
-        function compartilharLocalizacao() {
-            if (!navigator.geolocation) { alert('Seu navegador não suporta geolocalização.'); return; }
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const lat = position.coords.latitude, lng = position.coords.longitude;
-                const mapaUrl = `https://www.google.com/maps?q=${lat},${lng}&hl=pt-BR`;
-                const texto = `📍 Localização: ${mapaUrl}`;
-                const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-                await db.collection('chats').doc(chatId).collection('mensagens').add({ texto, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false, tipo: 'localizacao', lat, lng });
-            }, () => { alert('Não foi possível obter sua localização.'); });
-        }
-        
-        function mostrarFeedbackToque(event) {
-            const x = event.touches ? event.touches[0].clientX : event.clientX;
-            const y = event.touches ? event.touches[0].clientY : event.clientY;
-            const feedback = document.createElement('div');
-            feedback.className = 'toque-feedback';
-            feedback.style.left = (x - 20) + 'px';
-            feedback.style.top = (y - 20) + 'px';
-            document.body.appendChild(feedback);
-            setTimeout(() => feedback.remove(), 300);
-        }
-        
-        function tocarSom() {
-            if (!somAtivo) return;
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = 880;
-                gain.gain.value = 0.2;
-                osc.start();
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
-                osc.stop(audioCtx.currentTime + 0.3);
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-            } catch(e) {}
-        }
-        
-        function mostrarNotificacaoLocal(titulo, corpo) {
-            if (!notificacoesAtivas) return;
-            if (Notification.permission === 'granted') {
-                new Notification(titulo, { body: corpo, icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%230f2b3d"/%3E%3Ctext x="50" y="67" font-size="50" text-anchor="middle" fill="white"%3E💼%3C/text%3E%3C/svg%3E', vibrate: [200, 100, 200] });
-                tocarSom();
-            }
-        }
-        
-        async function solicitarPermissaoNotificacao() {
-            if (Notification.permission === 'granted') { notificacoesAtivas = true; return true; }
-            if (Notification.permission !== 'denied') {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') { notificacoesAtivas = true; return true; }
-            }
-            return false;
-        }
-        
-        function atualizarStatusOnline(userId, status) { db.collection('usuarios').doc(userId).update({ online: status, ultimoAcesso: new Date() }).catch(()=>{}); }
-        function iniciarStatusOnline() {
-            if (!usuarioAtual) return;
-            atualizarStatusOnline(usuarioAtual.id, true);
-            window.addEventListener('beforeunload', () => atualizarStatusOnline(usuarioAtual.id, false));
-            document.addEventListener('visibilitychange', () => atualizarStatusOnline(usuarioAtual.id, !document.hidden));
-            setInterval(() => atualizarStatusOnline(usuarioAtual.id, true), 30000);
-        }
-        
-        function formatarUltimoAcesso(data) {
-            if (!data) return 'visto agora pouco';
-            const date = data.toDate();
-            const diff = (new Date() - date) / 60000;
-            if (diff < 1) return 'visto agora pouco';
-            if (diff < 60) return `visto há ${Math.floor(diff)} min`;
-            if (diff < 1440) return `visto há ${Math.floor(diff / 60)} h`;
-            return `visto em ${date.toLocaleDateString()}`;
-        }
-        
-        async function bloquearUsuario(userId) {
-            if (confirm('Bloquear este usuário? Ele não poderá te enviar mensagens.')) {
-                await db.collection('usuarios').doc(usuarioAtual.id).update({ bloqueados: firebase.firestore.FieldValue.arrayUnion(userId) });
-                alert('Usuário bloqueado!');
-                voltar();
-            }
-        }
-        async function desbloquearUsuario(userId) { await db.collection('usuarios').doc(usuarioAtual.id).update({ bloqueados: firebase.firestore.FieldValue.arrayRemove(userId) }); alert('Usuário desbloqueado!'); mostrarConfiguracoes(); }
-        async function isBloqueado(userId) { const doc = await db.collection('usuarios').doc(usuarioAtual?.id).get(); return doc.data()?.bloqueados?.includes(userId) || false; }
-        
-        function mostrarConfiguracoes() {
-            const modal = document.getElementById('modalConfig');
-            const content = document.getElementById('modalConfigContent');
-            content.innerHTML = `
-                <h3>⚙️ CONFIGURAÇÕES</h3>
-                <div class="config-item"><label>🔔 Notificações</label><div class="toggle ${notificacoesAtivas ? 'active' : ''}" onclick="toggleNotificacoes(this)"><div class="toggle-ball"></div></div></div>
-                <div class="config-item"><label>🔊 Som das mensagens</label><div class="toggle ${somAtivo ? 'active' : ''}" onclick="toggleSom(this)"><div class="toggle-ball"></div></div></div>
-                <div class="config-item"><label>🌙 Tema escuro</label><div class="toggle ${tema === 'escuro' ? 'active' : ''}" onclick="toggleTema(this)"><div class="toggle-ball"></div></div></div>
-                <div class="config-item"><label>🔤 Tamanho da fonte</label><div><span class="fonte-option ${tamanhoFonte === 'pequena' ? 'active' : ''}" onclick="mudarFonte('pequena')">P</span><span class="fonte-option ${tamanhoFonte === 'normal' ? 'active' : ''}" onclick="mudarFonte('normal')">M</span><span class="fonte-option ${tamanhoFonte === 'grande' ? 'active' : ''}" onclick="mudarFonte('grande')">G</span></div></div>
-                <div class="config-item"><label>🔒 Usuários bloqueados</label><button class="btn-secondary" onclick="mostrarBloqueados()">Ver lista</button></div>
-                <div class="config-item"><label>👤 Meu perfil</label><button class="btn-secondary" onclick="mostrarEditarPerfil()">Editar perfil</button></div>
-                <div style="margin-top: 20px;"><button class="btn-secondary" onclick="fecharModalConfig()">Fechar</button></div>
-            `;
-            modal.style.display = 'flex';
-            pushNavigation({ type: 'config' });
-        }
-        
-        async function mostrarBloqueados() {
-            const doc = await db.collection('usuarios').doc(usuarioAtual.id).get();
-            const bloqueados = doc.data()?.bloqueados || [];
-            if (bloqueados.length === 0) { alert('Nenhum usuário bloqueado'); mostrarConfiguracoes(); return; }
-            const users = [];
-            for (const id of bloqueados) { const u = await db.collection('usuarios').doc(id).get(); if (u.exists) users.push({ id, ...u.data() }); }
-            const content = document.getElementById('modalConfigContent');
-            content.innerHTML = `<h3>🔒 Usuários bloqueados</h3>${users.map(u => `<div class="bloqueado-item"><div><strong>${u.nome}</strong><br><small>${u.profissao || ''}</small></div><button class="btn-desbloquear" onclick="desbloquearUsuario('${u.id}')">Desbloquear</button></div>`).join('')}<button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>`;
-        }
-        
-        function mostrarEditarPerfil() {
-            const content = document.getElementById('modalConfigContent');
-            content.innerHTML = `<h3>👤 Editar perfil</h3><input type="text" id="editNome" value="${escapeHtml(usuarioAtual.nome || '')}" placeholder="Nome"><input type="text" id="editProfissao" value="${escapeHtml(usuarioAtual.profissao || '')}" placeholder="Profissão"><textarea id="editBio" rows="3" placeholder="Bio">${escapeHtml(usuarioAtual.bio || '')}</textarea><button class="btn-primary" onclick="salvarPerfilConfig()">Salvar</button><button class="btn-secondary" onclick="mostrarConfiguracoes()">Voltar</button>`;
-        }
-        
-        async function salvarPerfilConfig() {
-            const novoNome = document.getElementById('editNome').value.trim();
-            const novaProfissao = document.getElementById('editProfissao').value.trim();
-            const novaBio = document.getElementById('editBio').value.trim();
-            if (!novoNome) { alert('Nome não pode ficar vazio'); return; }
-            await db.collection('usuarios').doc(usuarioAtual.id).update({ nome: novoNome, profissao: novaProfissao, bio: novaBio });
-            usuarioAtual.nome = novoNome; usuarioAtual.profissao = novaProfissao; usuarioAtual.bio = novaBio;
-            alert('Perfil atualizado!');
-            mostrarConfiguracoes();
-            renderizar();
-        }
-        
-        function toggleNotificacoes(el) { notificacoesAtivas = !notificacoesAtivas; el.classList.toggle('active'); if (notificacoesAtivas) solicitarPermissaoNotificacao(); }
-        function toggleSom(el) { somAtivo = !somAtivo; el.classList.toggle('active'); }
-        function toggleTema(el) { tema = tema === 'claro' ? 'escuro' : 'claro'; localStorage.setItem('tema', tema); el.classList.toggle('active'); aplicarTema(); }
-        function mudarFonte(t) { tamanhoFonte = t; localStorage.setItem('fonte', t); aplicarTema(); mostrarConfiguracoes(); }
-        function fecharModalConfig() { document.getElementById('modalConfig').style.display = 'none'; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'config') navigationStack.pop(); }
-        function fecharModalEditar() { document.getElementById('modalEditar').style.display = 'none'; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'editar') navigationStack.pop(); }
-        function fecharModalResponder() { document.getElementById('modalResponder').style.display = 'none'; respondendoMsg = null; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'responder') navigationStack.pop(); }
-        
-        function renderizar() {
-            const app = document.getElementById('app');
-            if (!usuarioAtual) {
-                app.innerHTML = `
-                    <div class="app"><div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div></div>
-                    <div style="flex:1; display: flex; align-items: center; justify-content: center;">
-                        <div class="form-card">
-                            <div class="tab-buttons"><button id="btnEntrar" class="tab-btn active">Entrar</button><button id="btnCadastrar" class="tab-btn">Cadastrar</button></div>
-                            <div id="telaEntrar"><div id="erroLogin" class="error"></div><input type="email" id="emailLogin" placeholder="E-mail"><input type="password" id="senhaLogin" placeholder="Senha"><button onclick="fazerLogin()">Entrar</button></div>
-                            <div id="telaCadastrar" style="display:none">
-                                <div id="erroCadastro" class="error"></div>
-                                <div id="sucessoCadastro" class="success"></div>
-                                <div class="input-group"><label>👤 Nome completo</label><input type="text" id="nome" placeholder="Seu nome"></div>
-                                <div class="input-group"><label>📧 E-mail</label><input type="email" id="email" placeholder="seu@email.com"></div>
-                                <div class="input-group"><label>🔑 Seu ID (gerado automaticamente)</label>
-                                    <div class="id-display" id="idGerado">${gerarIdAleatorio()}</div>
-                                    <div class="helper-text">Este ID será usado para te identificarem no chat. Guarde-o!</div>
-                                </div>
-                                <div class="input-group"><label>💼 Profissão (opcional)</label><input type="text" id="profissao" placeholder="Ex: Eletricista, Designer..."></div>
-                                <div class="input-group"><label>📝 Bio (opcional)</label><textarea id="bio" rows="2" placeholder="Fale sobre você"></textarea></div>
-                                <div class="input-group"><label>🔒 Senha</label><input type="password" id="senha" placeholder="Mínimo 6 caracteres"></div>
-                                <button onclick="fazerCadastro()">Criar conta</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.getElementById('btnEntrar').onclick = () => { document.getElementById('telaEntrar').style.display='block'; document.getElementById('telaCadastrar').style.display='none'; document.getElementById('btnEntrar').classList.add('active'); document.getElementById('btnCadastrar').classList.remove('active'); };
-                document.getElementById('btnCadastrar').onclick = () => { document.getElementById('telaEntrar').style.display='none'; document.getElementById('telaCadastrar').style.display='block'; document.getElementById('btnCadastrar').classList.add('active'); document.getElementById('btnEntrar').classList.remove('active'); };
-                document.getElementById('idGerado').innerText = gerarIdAleatorio();
-                if (navigationStack.length === 0) pushNavigation({ type: 'home' });
-            } else {
-                app.innerHTML = `<div class="app"><div class="header"><div class="logo"><div class="logo-icon">💼</div><h1>GOWORK <span>CHAT</span></h1></div><div style="display:flex; gap:8px;"><button class="btn-icon" onclick="mostrarConfiguracoes()">⚙️</button><button class="btn-sair" onclick="fazerLogout()">Sair</button></div></div><div id="listaUsuarios" class="lista-usuarios"><div class="loading">Carregando...</div></div></div>`;
-                carregarListas();
-                iniciarStatusOnline();
-                if (navigationStack.length === 0) pushNavigation({ type: 'home' });
-            }
-        }
-        
-        async function carregarListas() {
-            const container = document.getElementById('listaUsuarios');
-            try {
-                const users = [];
-                (await db.collection('usuarios').get()).forEach(d => { if (d.id !== usuarioAtual.id) users.push({ id: d.id, ...d.data() }); });
-                const chats = await db.collection('chats').get();
-                const contatos = new Set();
-                chats.forEach(d => { const ids = d.id.split('_'); contatos.add(ids[0] === usuarioAtual.id ? ids[1] : ids[0]); });
-                const conversas = [], novos = [];
-                for (const u of users) {
-                    if (contatos.has(u.id)) {
-                        const msgs = await db.collection('chats').doc(obterChatId(usuarioAtual.id, u.id)).collection('mensagens').orderBy('timestamp', 'desc').limit(1).get();
-                        let ultima = '';
-                        if (!msgs.empty) ultima = msgs.docs[0].data().texto.substring(0, 40);
-                        conversas.push({ ...u, ultima });
-                    } else { novos.push(u); }
-                }
-                let html = '';
-                if (conversas.length) html += `<div class="secao"><div class="secao-titulo">📌 CONVERSAS</div>${conversas.map(u => `<div class="usuario-item" onclick="abrirChat('${u.id}', '${u.nome}', '${u.profissao || ''}')"><div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}<div class="${u.online ? 'status-online' : 'status-offline'}"></div></div><div class="usuario-info"><div class="usuario-nome">${u.nome}</div><div class="usuario-profissao">${u.profissao || 'Profissional'}</div>${u.ultima ? `<div class="ultima-msg">${u.ultima}</div>` : ''}</div></div>`).join('')}</div>`;
-                if (novos.length) html += `<div class="secao"><div class="secao-titulo">👥 PRESTADORES</div>${novos.map(u => `<div class="usuario-item" onclick="abrirChat('${u.id}', '${u.nome}', '${u.profissao || ''}')"><div class="usuario-avatar">${u.nome.charAt(0).toUpperCase()}<div class="${u.online ? 'status-online' : 'status-offline'}"></div></div><div class="usuario-info"><div class="usuario-nome">${u.nome}</div><div class="usuario-profissao">${u.profissao || 'Profissional'}</div></div></div>`).join('')}</div>`;
-                if (!conversas.length && !novos.length) html = '<div class="loading">Nenhum prestador encontrado</div>';
-                container.innerHTML = html;
-                if (prestadorIdUrl) {
-                    const p = (await db.collection('usuarios').where('idUnico', '==', prestadorIdUrl).get()).docs[0];
-                    if (p) abrirChat(p.id, p.data().nome, p.data().profissao || '');
-                }
-            } catch(e) { container.innerHTML = '<div class="loading">Erro</div>'; }
-        }
-        
-        async function abrirChat(id, nome, prof) {
-            if (await isBloqueado(id)) { alert('Este usuário está bloqueado. Desbloqueie nas configurações.'); return; }
-            chatCom = { id, nome, profissao: prof };
-            modoSelecao = false;
-            mensagensSelecionadas.clear();
-            document.getElementById('app').innerHTML = `
-                <div class="app"><div class="chat-header"><button class="btn-icon" style="background:none;" onclick="voltar()">←</button><div class="chat-header-info" onclick="verPerfilChat()"><div class="chat-avatar">${nome.charAt(0).toUpperCase()}<div id="chatStatusDot" class="status-offline" style="width:10px;height:10px;position:absolute;bottom:0;right:0;"></div></div><div><div class="chat-nome">${escapeHtml(nome)}</div><div class="chat-status" id="chatStatus">Carregando...</div></div></div><div><button class="btn-icon" style="background:none;" onclick="abrirMenuChat(event)">⋮</button></div></div>
-                <div id="selectionBar" style="display:none;" class="selection-bar"></div>
-                <div id="respostaPreview" style="display:none;" class="resposta-preview"></div>
-                <div id="mensagensArea" class="mensagens-area"><div class="loading">Carregando...</div></div>
-                <div class="input-area">
-                    <div class="input-wrapper">
-                        <button class="btn-localizacao" onclick="compartilharLocalizacao()">📍</button>
-                        <textarea id="msgInput" class="input-mensagem" placeholder="Digite sua mensagem..." rows="1"></textarea>
-                        <button class="btn-input" onclick="mostrarEmojisPrincipal()">😀</button>
-                    </div>
-                    <button class="btn-enviar" onclick="enviarMsg()">➤</button>
-                </div>`;
-            const input = document.getElementById('msgInput');
-            if (input) {
-                input.addEventListener('keypress', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviarMsg(); } });
-                setTimeout(() => { input.focus(); input.click(); }, 300);
-            }
-            garantirFocoInput();
-            marcarMensagensComoLidas();
-            carregarMensagens();
-            db.collection('usuarios').doc(chatCom.id).onSnapshot(doc => {
-                if (!doc.exists) return;
-                const online = doc.data().online;
-                const status = document.getElementById('chatStatus');
-                const dot = document.getElementById('chatStatusDot');
-                if (status) status.innerText = online ? '🟢 Online' : `⚫ ${formatarUltimoAcesso(doc.data().ultimoAcesso)}`;
-                if (dot) dot.className = online ? 'status-online' : 'status-offline';
-            });
-            pushNavigation({ type: 'chat', id: id });
-            setTimeout(() => ajustarScroll(), 300);
-        }
-        
-        async function marcarMensagensComoLidas() {
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const msgsNaoLidas = await db.collection('chats').doc(chatId).collection('mensagens')
-                .where('remetenteId', '!=', usuarioAtual.id)
-                .where('lido', '==', false)
-                .get();
-            if (msgsNaoLidas.empty) return;
-            const batch = db.batch();
-            msgsNaoLidas.forEach(doc => batch.update(doc.ref, { lido: true, lidoEm: new Date() }));
-            await batch.commit();
-        }
-        
-        function observarMensagensParaLer() {
-            const container = document.getElementById('mensagensArea');
-            if (!container) return;
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const msgDiv = entry.target;
-                        const msgId = msgDiv.getAttribute('data-id');
-                        const isFromOther = !msgDiv.classList.contains('enviada');
-                        const jaLida = msgDiv.getAttribute('data-lido') === 'true';
-                        if (isFromOther && !jaLida && msgId) {
-                            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-                            db.collection('chats').doc(chatId).collection('mensagens').doc(msgId).update({ lido: true, lidoEm: new Date() }).then(() => {
-                                msgDiv.setAttribute('data-lido', 'true');
-                                const horaSpan = msgDiv.querySelector('.mensagem-hora');
-                                if (horaSpan) {
-                                    const vistoIcon = horaSpan.querySelector('.visto-icon');
-                                    if (vistoIcon) {
-                                        vistoIcon.className = 'visto-icon visto-lido';
-                                        vistoIcon.innerHTML = '✓✓';
-                                        vistoIcon.style.color = '#60a5fa';
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-            }, { threshold: 0.5 });
-            document.querySelectorAll('.mensagem.recebida').forEach(msg => observer.observe(msg));
-        }
-        
-        function abrirMenuChat(event) {
-            event.stopPropagation();
-            const menu = document.getElementById('menuContexto');
-            if (menu.style.display === 'block') { menu.style.display = 'none'; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'menu') navigationStack.pop(); return; }
-            menu.innerHTML = `<button onclick="apagarTudo()">🗑️ Apagar todas</button><button onclick="bloquearUsuario('${chatCom.id}')">🔒 Bloquear usuário</button>`;
-            const btn = event.currentTarget;
-            const rect = btn.getBoundingClientRect();
-            const menuWidth = 200, menuHeight = 90;
-            let left = rect.left + rect.width / 2 - menuWidth / 2;
-            let top = rect.bottom + 5;
-            if (left < 10) left = 10;
-            if (left + menuWidth > window.innerWidth - 10) left = window.innerWidth - menuWidth - 10;
-            if (top + menuHeight > window.innerHeight - 10) top = rect.top - menuHeight - 5;
-            if (top < 10) top = 10;
-            menu.style.display = 'block';
-            menu.style.left = left + 'px';
-            menu.style.top = top + 'px';
-            menu.style.transform = 'none';
-            pushNavigation({ type: 'menu' });
-            const fecharMenu = (e) => {
-                if (!menu.contains(e.target) && e.target !== btn) {
-                    menu.style.display = 'none';
-                    if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'menu') navigationStack.pop();
-                    document.removeEventListener('click', fecharMenu);
-                    document.removeEventListener('touchstart', fecharMenu);
-                }
-            };
-            setTimeout(() => { document.addEventListener('click', fecharMenu); document.addEventListener('touchstart', fecharMenu); }, 100);
-        }
-        
-        async function apagarTudo() {
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const msgs = await db.collection('chats').doc(chatId).collection('mensagens').get();
-            if (msgs.empty) { alert('Nenhuma mensagem para apagar.'); return; }
-            if (confirm(`Apagar TODAS as mensagens desta conversa apenas para você? (${msgs.size} mensagens)`)) {
-                for (const doc of msgs.docs) {
-                    const apagadoPor = doc.data().apagadoPor || [];
-                    if (!apagadoPor.includes(usuarioAtual.id)) { apagadoPor.push(usuarioAtual.id); await doc.ref.update({ apagadoPor: apagadoPor }); }
-                }
-                mensagensSelecionadas.clear(); modoSelecao = false; atualizarBarraSelecao(); document.getElementById('menuContexto').style.display = 'none'; alert('Todas as mensagens foram apagadas apenas para você!');
-            }
-        }
-        
-        async function apagarSelecionadas() {
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            const mensagensParaApagar = [];
-            for (const id of mensagensSelecionadas) {
-                const doc = await db.collection('chats').doc(chatId).collection('mensagens').doc(id).get();
-                if (doc.exists && doc.data().remetenteId === usuarioAtual.id) mensagensParaApagar.push(id);
-            }
-            if (mensagensParaApagar.length === 0) { alert('Você só pode apagar suas próprias mensagens.'); return; }
-            if (confirm(`Apagar ${mensagensParaApagar.length} mensagem(s) sua(s) apenas para você?`)) {
-                for (const id of mensagensParaApagar) {
-                    const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(id);
-                    const doc = await msgRef.get();
-                    if (doc.exists) {
-                        const apagadoPor = doc.data().apagadoPor || [];
-                        if (!apagadoPor.includes(usuarioAtual.id)) { apagadoPor.push(usuarioAtual.id); await msgRef.update({ apagadoPor: apagadoPor }); }
-                    }
-                }
-                mensagensSelecionadas.clear(); modoSelecao = false; atualizarBarraSelecao();
-            }
-        }
-        
-        async function apagarParaTodos() {
-            if (confirm('Apagar esta mensagem para todos? Ela será removida para você e para o destinatário.')) {
-                const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-                await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).delete();
-                document.getElementById('menuContexto').style.display = 'none';
-            }
-        }
-        
-        async function verPerfilChat() {
-            const doc = await db.collection('usuarios').doc(chatCom.id).get();
-            if (doc.exists) alert(`👤 ${doc.data().nome}\n💼 ${doc.data().profissao || 'Profissão não informada'}\n📝 ${doc.data().bio || 'Nenhuma bio'}\n${doc.data().online ? '🟢 Online' : '⚫ Offline'}`);
-        }
-        
-        function voltar() { if (unsubscribeMessages) unsubscribeMessages(); chatCom = null; renderizar(); if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'chat') navigationStack.pop(); }
-        
-        let ultimaMsgId = null;
-        
-        function carregarMensagens() {
-            const chatId = obterChatId(usuarioAtual.id, chatCom.id);
-            if (unsubscribeMessages) unsubscribeMessages();
-            unsubscribeMessages = db.collection('chats').doc(chatId).collection('mensagens').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
-                const container = document.getElementById('mensagensArea');
-                if (!container) return;
-                const todasMsgs = [];
-                snapshot.forEach(doc => todasMsgs.push({ id: doc.id, ...doc.data() }));
-                const msgsVisiveis = todasMsgs.filter(m => !(m.apagadoPor && m.apagadoPor.includes(usuarioAtual.id)));
-                msgsVisiveis.sort((a, b) => (a.timestamp?.toDate().getTime() || 0) - (b.timestamp?.toDate().getTime() || 0));
-                if (msgsVisiveis.length > 0) {
-                    const ultima = msgsVisiveis[msgsVisiveis.length - 1];
-                    if (ultima.remetenteId !== usuarioAtual.id && ultimaMsgId !== ultima.id) {
-                        mostrarNotificacaoLocal(`💼 ${chatCom.nome}`, ultima.texto);
-                        tocarSom();
-                        ultimaMsgId = ultima.id;
-                    }
-                }
-                if (msgsVisiveis.length === 0) { container.innerHTML = '<div class="loading">💬 Nenhuma mensagem</div>'; return; }
-                let html = '';
-                for (let i = 0; i < msgsVisiveis.length; i++) {
-                    const m = msgsVisiveis[i];
-                    const enviada = m.remetenteId === usuarioAtual.id;
-                    let hora = '';
-                    if (m.timestamp) hora = m.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const editado = m.editado ? '<span class="mensagem-editado">(editado)</span>' : '';
-                    const selecionada = mensagensSelecionadas.has(m.id);
-                    const respostaHtml = m.resposta ? `<div class="mensagem-resposta">↩️ ${escapeHtml(m.resposta.autor)}: ${escapeHtml(m.resposta.texto)}</div>` : '';
-                    let conteudo = escapeHtml(m.texto);
-                    if (m.tipo === 'localizacao' && m.lat && m.lng) conteudo = `<a href="https://www.google.com/maps?q=${m.lat},${m.lng}&hl=pt-BR" target="_blank" style="color: inherit; text-decoration: underline;">📍 Ver localização no mapa</a>`;
-                    let vistoIcon = '';
-                    if (enviada) vistoIcon = m.lido ? '<span class="visto-icon visto-lido" style="color: #60a5fa;">✓✓</span>' : '<span class="visto-icon visto-enviado">✓</span>';
-                    const nomeRemetente = `<div class="mensagem-nome">${escapeHtml(enviada ? 'Você' : chatCom.nome)}</div>`;
-                    html += `<div class="mensagem ${enviada ? 'enviada' : 'recebida'} ${selecionada ? 'mensagem-selecionada' : ''}" data-id="${m.id}" data-lido="${m.lido ? 'true' : 'false'}">
-                        <div class="mensagem-bolha" onclick="if(modoSelecao) { selecionarMensagem('${m.id}') } else { abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}) }" oncontextmenu="abrirMenuMensagem(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada}); return false;" ontouchstart="iniciarPressionar(event, '${m.id}', '${escapeHtml(m.texto)}', ${enviada})" ontouchend="cancelarPressionar()" ontouchmove="cancelarPressionar()">
-                            ${respostaHtml}${nomeRemetente}<div class="mensagem-texto">${conteudo}${editado}</div><div class="mensagem-hora">${hora}${vistoIcon}</div>
-                        </div>
-                    </div>`;
-                }
-                container.innerHTML = html;
-                setTimeout(() => { container.scrollTop = container.scrollHeight; observarMensagensParaLer(); }, 100);
-            });
-        }
-        
-        function iniciarPressionar(event, id, texto, enviada) {
-            if (pressionarTimeout) clearTimeout(pressionarTimeout);
-            pressionarTimeout = setTimeout(() => {
-                if (!modoSelecao) { mostrarFeedbackToque(event); modoSelecao = true; selecionarMensagem(id); document.getElementById('menuContexto').style.display = 'none'; }
-            }, 300);
-        }
-        function cancelarPressionar() { if (pressionarTimeout) { clearTimeout(pressionarTimeout); pressionarTimeout = null; } }
-        
-        function abrirMenuMensagem(event, id, texto, enviada) {
-            event.stopPropagation(); cancelarPressionar(); mostrarFeedbackToque(event);
-            if (modoSelecao) { selecionarMensagem(id); return; }
-            mensagemSelecionada = { id, texto };
-            const menu = document.getElementById('menuContexto');
-            let menuHtml = '';
-            if (!enviada) menuHtml = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button><button onclick="copiarMensagem()">📋 Copiar</button>`;
-            else menuHtml = `<button onclick="responderMsg('${id}', '${escapeHtml(texto)}')">💬 Responder</button><button onclick="copiarMensagem()">📋 Copiar</button><button onclick="editarMsg()">✏️ Editar</button><button onclick="apagarMsg()">🗑️ Apagar para mim</button><button onclick="apagarParaTodos()">🗑️ Apagar para todos</button><button onclick="iniciarModoSelecao()">✅ Selecionar mensagens</button>`;
-            menu.innerHTML = menuHtml;
-            let x = event.touches ? event.touches[0].clientX : event.clientX, y = event.touches ? event.touches[0].clientY : event.clientY;
-            const menuWidth = 200, menuHeight = enviada ? 260 : 90, vw = window.innerWidth, vh = window.innerHeight;
-            let left = x - menuWidth / 2, top = y - menuHeight - 10;
-            if (left < 10) left = 10; if (left + menuWidth > vw - 10) left = vw - menuWidth - 10;
-            if (top < 10) top = y + 20; if (top + menuHeight > vh - 10) top = vh - menuHeight - 10; if (top < 10) top = 10;
-            menu.style.display = 'block'; menu.style.left = left + 'px'; menu.style.top = top + 'px';
-            pushNavigation({ type: 'menu' });
-            setTimeout(() => { document.addEventListener('click', () => { menu.style.display = 'none'; if (navigationStack.length > 0 && navigationStack[navigationStack.length - 1].type === 'menu') navigationStack.pop(); }, { once: true }); }, 100);
-        }
-        
-        function iniciarModoSelecao() { modoSelecao = true; document.getElementById('menuContexto').style.display = 'none'; mensagensSelecionadas.clear(); document.querySelectorAll('.mensagem-selecionada').forEach(el => el.classList.remove('mensagem-selecionada')); atualizarBarraSelecao(); }
-        function selecionarMensagem(id) { if (!modoSelecao) return; if (mensagensSelecionadas.has(id)) mensagensSelecionadas.delete(id); else mensagensSelecionadas.add(id); const div = document.querySelector(`.mensagem[data-id="${id}"] .mensagem-bolha`); if (div) { if (mensagensSelecionadas.has(id)) div.parentElement.classList.add('mensagem-selecionada'); else div.parentElement.classList.remove('mensagem-selecionada'); } atualizarBarraSelecao(); }
-        function atualizarBarraSelecao() {
-            const barra = document.getElementById('selectionBar');
-            if (mensagensSelecionadas.size > 0) barra.style.display = 'flex', barra.innerHTML = `<span>📌 ${mensagensSelecionadas.size} mensagem(ns) selecionada(s)</span><div><button onclick="apagarSelecionadas()">🗑️ Apagar selecionadas</button><button onclick="apagarTudo()">🗑️ Apagar todas</button><button onclick="cancelarSelecao()">✖️ Cancelar</button></div>`;
-            else if (modoSelecao) barra.style.display = 'flex', barra.innerHTML = `<span>📌 Modo seleção ativado. Toque nas mensagens para selecionar.</span><div><button onclick="cancelarSelecao()">✖️ Cancelar</button></div>`;
-            else barra.style.display = 'none';
-        }
-        function cancelarSelecao() { modoSelecao = false; mensagensSelecionadas.clear(); atualizarBarraSelecao(); document.querySelectorAll('.mensagem-selecionada').forEach(el => el.classList.remove('mensagem-selecionada')); }
-        function responderMsg(id, texto) { document.getElementById('menuContexto').style.display = 'none'; respondendoMsg = { id, texto }; document.getElementById('respostaOriginal').innerText = texto; document.getElementById('respostaTexto').value = ''; document.getElementById('modalResponder').style.display = 'flex'; pushNavigation({ type: 'responder' }); }
-        async function enviarResposta() { const resposta = document.getElementById('respostaTexto').value.trim(); if (!resposta) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: resposta, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false, resposta: { autor: usuarioAtual.nome, texto: respondendoMsg.texto, msgId: respondendoMsg.id } }); fecharModalResponder(); }
-        function editarMsg() { document.getElementById('menuContexto').style.display = 'none'; document.getElementById('editarTexto').value = mensagemSelecionada.texto; document.getElementById('modalEditar').style.display = 'flex'; pushNavigation({ type: 'editar' }); }
-        async function apagarMsg() { document.getElementById('menuContexto').style.display = 'none'; if (confirm('Apagar esta mensagem apenas para você?')) { const chatId = obterChatId(usuarioAtual.id, chatCom.id); const msgRef = db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id); const doc = await msgRef.get(); if (doc.exists) { const apagadoPor = doc.data().apagadoPor || []; if (!apagadoPor.includes(usuarioAtual.id)) { apagadoPor.push(usuarioAtual.id); await msgRef.update({ apagadoPor: apagadoPor }); } } } }
-        async function salvarEdicao() { const novo = document.getElementById('editarTexto').value.trim(); if (!novo) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').doc(mensagemSelecionada.id).update({ texto: novo, editado: true }); fecharModalEditar(); }
-        function escapeHtml(t) { if (!t) return ''; return t.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
-        async function enviarMsg() { const input = document.getElementById('msgInput'); const t = input.value.trim(); if (!t) return; const chatId = obterChatId(usuarioAtual.id, chatCom.id); await db.collection('chats').doc(chatId).collection('mensagens').add({ texto: t, remetenteId: usuarioAtual.id, destinatarioId: chatCom.id, timestamp: new Date(), editado: false, lido: false }); input.value = ''; fecharEmojiPicker(); }
-        function obterChatId(a,b) { return a < b ? `${a}_${b}` : `${b}_${a}`; }
-        
-        async function fazerLogin() {
-            const email = document.getElementById('emailLogin').value, senha = document.getElementById('senhaLogin').value, err = document.getElementById('erroLogin');
-            if (!email || !senha) { err.style.display='block'; err.innerText='Preencha e-mail e senha'; return; }
-            err.style.display='none';
-            try {
-                const r = await auth.signInWithEmailAndPassword(email, senha);
-                const d = await db.collection('usuarios').doc(r.user.uid).get();
-                usuarioAtual = { id: r.user.uid, nome: d.data()?.nome || email.split('@')[0], email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
-                aplicarTema(); renderizar(); solicitarPermissaoNotificacao();
-            } catch(e) { err.style.display='block'; err.innerText=e.message; }
-        }
-        
-        async function fazerCadastro() {
-            const nome = document.getElementById('nome').value, email = document.getElementById('email').value, idUnico = document.getElementById('idGerado').innerText, prof = document.getElementById('profissao').value, bio = document.getElementById('bio').value, senha = document.getElementById('senha').value, err = document.getElementById('erroCadastro'), suc = document.getElementById('sucessoCadastro');
-            err.style.display='none'; suc.style.display='none';
-            if (!nome || !email || !senha) { err.style.display='block'; err.innerText='Preencha nome, e-mail e senha'; return; }
-            if (senha.length < 6) { err.style.display='block'; err.innerText='Senha mínimo 6'; return; }
-            const existe = await db.collection('usuarios').where('idUnico', '==', idUnico).get();
-            if (!existe.empty) { const novoId = gerarIdAleatorio(); document.getElementById('idGerado').innerText = novoId; err.style.display='block'; err.innerText='Este ID já existe. Geramos outro para você. Tente novamente.'; return; }
-            try {
-                const r = await auth.createUserWithEmailAndPassword(email, senha);
-                await db.collection('usuarios').doc(r.user.uid).set({ nome, email, idUnico, profissao: prof || '', bio: bio || '', criadoEm: new Date(), online: true });
-                suc.style.display='block'; suc.innerText='Conta criada! Seu ID: ' + idUnico;
-                usuarioAtual = { id: r.user.uid, nome, email, idUnico, profissao: prof || '', bio: bio || '' };
-                setTimeout(() => { aplicarTema(); renderizar(); solicitarPermissaoNotificacao(); }, 1500);
-            } catch(e) { err.style.display='block'; err.innerText=e.message; }
-        }
-        
-        async function fazerLogout() { if (unsubscribeMessages) unsubscribeMessages(); if (usuarioAtual) await db.collection('usuarios').doc(usuarioAtual.id).update({ online: false }); await auth.signOut(); usuarioAtual = null; renderizar(); }
-        
-        window.addEventListener('popstate', () => {
-            const emojiPicker = document.getElementById('emojiPicker');
-            if (emojiPicker && emojiPicker.style.display === 'flex') { fecharEmojiPicker(); return; }
-            popNavigation();
-        });
-        
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                const d = await db.collection('usuarios').doc(user.uid).get();
-                usuarioAtual = { id: user.uid, nome: d.data()?.nome || user.email.split('@')[0], email: user.email, idUnico: d.data()?.idUnico || '', profissao: d.data()?.profissao || '', bio: d.data()?.bio || '' };
-                aplicarTema(); renderizar();
-                history.pushState(null, null, location.href);
-            } else renderizar();
-        });
-    </script>
-</body>
-</html>
+                else if (lastState.typetate.type</html>
